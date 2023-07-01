@@ -1,36 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+        <title>Felipe Arcaro - Articles by Felipe Arcaro</title>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="generator" content="Pelican" />
-        <title>Felipe Arcaro - Felipe Arcaro</title>
-        <link rel="stylesheet" href="/theme/css/main.css" />
 </head>
 
 <body id="index" class="home">
         <header id="banner" class="body">
                 <h1><a href="/">Felipe Arcaro</a></h1>
-                <nav><ul>
-                    <li><a href="/category/engineering.html">Engineering</a></li>
-                    <li><a href="/category/engineering-devops.html">engineering, devops</a></li>
-                </ul></nav>
         </header><!-- /#banner -->
+        <nav id="menu"><ul>
+            <li><a href="/category/data-engineering.html">Data Engineering</a></li>
+            <li><a href="/category/devops.html">DevOps</a></li>
+            <li><a href="/category/engineering.html">Engineering</a></li>
+        </ul></nav><!-- /#menu -->
+<section id="content">
+<h2>Articles by Felipe Arcaro</h2>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/a-data-catalog-at-a-click-of-a-button.html">A data catalog at a click of a button</a></h1>
-<footer class="post-info">
-        <abbr class="published" title="2023-07-02T15:00:00+02:00">
-                Published: Sun 02 July 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/felipe-arcaro.html">Felipe Arcaro</a>
-        </address>
-<p>In <a href="/category/engineering-devops.html">engineering, devops</a>.</p>
-<p>tags: <a href="/tag/data-engineering.html">data-engineering</a> <a href="/tag/python.html">python</a> <a href="/tag/flask.html">flask</a> <a href="/tag/big-query.html">big-query</a> </p>
-</footer><!-- /.post-info --><h2>How to get started</h2>
+<ol id="post-list">
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/a-data-catalog-at-a-click-of-a-button.html" rel="bookmark" title="Permalink to A data catalog at a click of a button">A data catalog at a click of a button</a></h2> </header>
+                <footer class="post-info">
+                    <time class="published" datetime="2023-07-02T15:00:00+02:00"> Sun 02 July 2023 </time>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/felipe-arcaro.html">Felipe Arcaro</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <h2>How to get started</h2>
 <h3>Step 1:</h3>
 <p>Download Python, Postgres and PgAdmin:
 - <a href="https://www.python.org/downloads/">Python</a>
@@ -45,149 +42,51 @@
   - C:\Program Files\PostgreSQL\10\bin 
   - C:\Program Files\PostgreSQL\10\lib</p>
 <h3>Step 2:</h3>
-<p>Set up development environment: 
-- Open the terminal on the project root and run <code>python3 -m venv env-data-catalog</code> to create the virtual environment <code>env-data-catalog</code> where Python packages will be installed
-   - If you're a Windows user, you need to run <code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted</code> on an elevated command prompt
-- To activate your virtual environment, run <code>venv\Scripts\activate</code> on Windows or <code>source venv/bin/activate</code> on Mac
-- To install all Python packages, run <code>pip install -r requirements.txt</code>
-- To install the common package, run <code>pip -e install .</code>
-- Create a <code>.env</code> file:</p>
-<div class="highlight"><pre><span></span><code>PG_HOST=localhost
-PG_USER=postgres
-PG_DATABASE=data_catalog
-PG_PASSWORD=root
-
-SF_ACCOUNT=&lt;snowflake_account&gt;
-SF_USER=&lt;snowflake_user&gt;
-SF_PASSWORD=&lt;snowflake_pw&gt;
-
-MYSQL_ACCOUNT=&lt;mysql_account&gt;
-MYSQL_USER=&lt;mysql_user&gt;
-MYSQL_PASSOWRD=&lt;mysql_passowrd&gt;
-</code></pre></div>
-
-<h3>Step 3:</h3>
-<p>Create tables on Postgres:
-- Open PgAdmin and create a database called <code>data_catalog</code>
-- Run the following commands on the terminal from the project root
-  - Initialize database and enable migrations <code>flask db init</code>
-  - Initiate migration <code>flask db migrate</code>
-  - Upgrade tables <code>flask db upgrade</code></p>
-<h3>Step 4:</h3>
-<p>Run data extractors on <code>getting_started</code> folder:
-- Run the following files:
-  - <code>getting_started\extractors\extractor_mysql.py</code>
-  - <code>getting_started\extractors\extractor_snowflake.py</code>
-  - <code>getting_started\data_lineage\merge_into_table_regex.py</code></p>
-<h3>Step 5:</h3>
-<p>Start application:
-- Run <code>app.py</code> file</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/easily-create-a-data-pipeline-with-airflow-dynamic-dags.html" rel="bookmark"
-                           title="Permalink to Easily create a data pipeline with Airflow dynamic dags">Easily create a data pipeline with Airflow dynamic dags</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-07-02T15:00:00+02:00">
-                Published: Sun 02 July 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/felipe-arcaro.html">Felipe Arcaro</a>
-        </address>
-<p>In <a href="/category/engineering.html">Engineering</a>.</p>
-<p>tags: <a href="/tag/data-engineering.html">data-engineering</a> <a href="/tag/python.html">python</a> <a href="/tag/flask.html">flask</a> <a href="/tag/big-query.html">big-query</a> </p>
-</footer><!-- /.post-info -->                <p>TBD</p>
-                <a class="readmore" href="/easily-create-a-data-pipeline-with-airflow-dynamic-dags.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/contributing-to-open-source-projects.html" rel="bookmark"
-                           title="Permalink to Contributing to open source projects">Contributing to open source projects</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-07-01T14:00:00+02:00">
-                Published: Sat 01 July 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/felipe-arcaro.html">Felipe Arcaro</a>
-        </address>
-<p>In <a href="/category/engineering.html">Engineering</a>.</p>
-<p>tags: <a href="/tag/data-engineering.html">data-engineering</a> <a href="/tag/python.html">python</a> </p>
-</footer><!-- /.post-info -->                <p>Here are my most recent contributions:</p>
+<p>Set up …</p> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/easily-create-a-data-pipeline-with-airflow-dynamic-dags.html" rel="bookmark" title="Permalink to Easily create a data pipeline with Airflow dynamic dags">Easily create a data pipeline with Airflow dynamic dags</a></h2> </header>
+                <footer class="post-info">
+                    <time class="published" datetime="2023-07-02T15:00:00+02:00"> Sun 02 July 2023 </time>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/felipe-arcaro.html">Felipe Arcaro</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p>TBD</p> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/contributing-to-open-source-projects.html" rel="bookmark" title="Permalink to Contributing to open source projects">Contributing to open source projects</a></h2> </header>
+                <footer class="post-info">
+                    <time class="published" datetime="2023-07-01T14:00:00+02:00"> Sat 01 July 2023 </time>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/felipe-arcaro.html">Felipe Arcaro</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p>Here are my most recent contributions:</p>
 <ul>
 <li><a href="https://github.com/aws/aws-mwaa-local-runner/pull/280">Added Dynamic DAGs example to MWAA local</a> </li>
-</ul>
-                <a class="readmore" href="/contributing-to-open-source-projects.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/using-pelican-and-github-pages.html" rel="bookmark"
-                           title="Permalink to Using Pelican and GitHub Pages">Using Pelican and GitHub Pages</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-07-01T14:00:00+02:00">
-                Published: Sat 01 July 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/felipe-arcaro.html">Felipe Arcaro</a>
-        </address>
-<p>In <a href="/category/engineering.html">Engineering</a>.</p>
-<p>tags: <a href="/tag/data-engineering.html">data-engineering</a> <a href="/tag/python.html">python</a> </p>
-</footer><!-- /.post-info -->                <p>Here are my most recent contributions:</p>
+</ul> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/using-pelican-and-github-pages.html" rel="bookmark" title="Permalink to Using Pelican and GitHub Pages">Using Pelican and GitHub Pages</a></h2> </header>
+                <footer class="post-info">
+                    <time class="published" datetime="2023-07-01T14:00:00+02:00"> Sat 01 July 2023 </time>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/felipe-arcaro.html">Felipe Arcaro</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p>Here are my most recent contributions:</p>
 <ul>
 <li><a href="https://github.com/aws/aws-mwaa-local-runner/pull/280">Added Dynamic DAGs example to MWAA local</a> </li>
-</ul>
-                <a class="readmore" href="/using-pelican-and-github-pages.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
-        <section id="extras" class="body">
-                <div class="blogroll">
-                        <h2>links</h2>
-                        <ul>
-                            <li><a href="https://getpelican.com/">Pelican</a></li>
-                            <li><a href="https://www.python.org/">Python.org</a></li>
-                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
-                            <li><a href="#">You can modify those links in your config file</a></li>
-                        </ul>
-                </div><!-- /.blogroll -->
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
-
-                            <li><a href="#">You can add links in your config file</a></li>
-                            <li><a href="#">Another social link</a></li>
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
-
+</ul> </div><!-- /.entry-content -->
+        </article></li>
+</ol><!-- /#posts-list -->
+</section><!-- /#content -->
         <footer id="contentinfo" class="body">
                 <address id="about" class="vcard body">
-                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>,
+                which takes great advantage of <a href="https://www.python.org/">Python</a>.
                 </address><!-- /#about -->
-
-                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
         </footer><!-- /#contentinfo -->
-
 </body>
 </html>
