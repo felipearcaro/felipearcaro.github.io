@@ -13,12 +13,13 @@
                 <h1><a href="/">Felipe Arcaro</a></h1>
                 <nav><ul>
                     <li class="active"><a href="/category/engineering.html">Engineering</a></li>
+                    <li><a href="/category/engineering-devops.html">engineering, devops</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/a-data-catalog-at-a-click-of-a-button.html">A data catalog at a click of a button</a></h1>
+                    <h1 class="entry-title"><a href="/easily-create-a-data-pipeline-with-airflow-dynamic-dags.html">Easily create a data pipeline with Airflow dynamic dags</a></h1>
 <footer class="post-info">
         <abbr class="published" title="2023-07-02T15:00:00+02:00">
                 Published: Sun 02 July 2023
@@ -29,85 +30,12 @@
         </address>
 <p>In <a href="/category/engineering.html">Engineering</a>.</p>
 <p>tags: <a href="/tag/data-engineering.html">data-engineering</a> <a href="/tag/python.html">python</a> <a href="/tag/flask.html">flask</a> <a href="/tag/big-query.html">big-query</a> </p>
-</footer><!-- /.post-info --><h2>How to get started</h2>
-<h3>Step 1:</h3>
-<p>Download Python, Postgres and PgAdmin:
-- <a href="https://www.python.org/downloads/">Python</a>
-- <a href="https://www.enterprisedb.com/downloads/postgres-postgresql-downloads">Postgres v10.22</a>
-  - Choose password <code>root</code>
-- <a href="https://www.pgadmin.org/download/pgadmin-4-windows">PgAdmin</a>
-  - host: <code>localhost</code>
-  - database: <code>data_catalog</code>
-  - user: <code>postgres</code>
-  - password: <code>root</code> 
-- Add the following directories to PATH variable 
-  - C:\Program Files\PostgreSQL\10\bin 
-  - C:\Program Files\PostgreSQL\10\lib</p>
-<h3>Step 2:</h3>
-<p>Set up development environment: 
-- Open the terminal on the project root and run <code>python3 -m venv env-data-catalog</code> to create the virtual environment <code>env-data-catalog</code> where Python packages will be installed
-   - If you're a Windows user, you need to run <code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted</code> on an elevated command prompt
-- To activate your virtual environment, run <code>venv\Scripts\activate</code> on Windows or <code>source venv/bin/activate</code> on Mac
-- To install all Python packages, run <code>pip install -r requirements.txt</code>
-- To install the common package, run <code>pip -e install .</code>
-- Create a <code>.env</code> file:</p>
-<div class="highlight"><pre><span></span><code>PG_HOST=localhost
-PG_USER=postgres
-PG_DATABASE=data_catalog
-PG_PASSWORD=root
-
-SF_ACCOUNT=&lt;snowflake_account&gt;
-SF_USER=&lt;snowflake_user&gt;
-SF_PASSWORD=&lt;snowflake_pw&gt;
-
-MYSQL_ACCOUNT=&lt;mysql_account&gt;
-MYSQL_USER=&lt;mysql_user&gt;
-MYSQL_PASSOWRD=&lt;mysql_passowrd&gt;
-</code></pre></div>
-
-<h3>Step 3:</h3>
-<p>Create tables on Postgres:
-- Open PgAdmin and create a database called <code>data_catalog</code>
-- Run the following commands on the terminal from the project root
-  - Initialize database and enable migrations <code>flask db init</code>
-  - Initiate migration <code>flask db migrate</code>
-  - Upgrade tables <code>flask db upgrade</code></p>
-<h3>Step 4:</h3>
-<p>Run data extractors on <code>getting_started</code> folder:
-- Run the following files:
-  - <code>getting_started\extractors\extractor_mysql.py</code>
-  - <code>getting_started\extractors\extractor_snowflake.py</code>
-  - <code>getting_started\data_lineage\merge_into_table_regex.py</code></p>
-<h3>Step 5:</h3>
-<p>Start application:
-- Run <code>app.py</code> file</p>                </article>
+</footer><!-- /.post-info --><p>TBD</p>                </article>
             </aside><!-- /#featured -->
                 <section id="content" class="body">
                     <h1>Other articles</h1>
                     <hr />
                     <ol id="posts-list" class="hfeed">
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/easily-create-a-data-pipeline-with-airflow-dynamic-dags.html" rel="bookmark"
-                           title="Permalink to Easily create a data pipeline with Airflow dynamic dags">Easily create a data pipeline with Airflow dynamic dags</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-07-02T15:00:00+02:00">
-                Published: Sun 02 July 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/felipe-arcaro.html">Felipe Arcaro</a>
-        </address>
-<p>In <a href="/category/engineering.html">Engineering</a>.</p>
-<p>tags: <a href="/tag/data-engineering.html">data-engineering</a> <a href="/tag/python.html">python</a> <a href="/tag/flask.html">flask</a> <a href="/tag/big-query.html">big-query</a> </p>
-</footer><!-- /.post-info -->                <p>TBD</p>
-                <a class="readmore" href="/easily-create-a-data-pipeline-with-airflow-dynamic-dags.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -131,6 +59,31 @@ MYSQL_PASSOWRD=&lt;mysql_passowrd&gt;
 <li><a href="https://github.com/aws/aws-mwaa-local-runner/pull/280">Added Dynamic DAGs example to MWAA local</a> </li>
 </ul>
                 <a class="readmore" href="/contributing-to-open-source-projects.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/using-pelican-and-github-pages.html" rel="bookmark"
+                           title="Permalink to Using Pelican and GitHub Pages">Using Pelican and GitHub Pages</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-07-01T14:00:00+02:00">
+                Published: Sat 01 July 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/felipe-arcaro.html">Felipe Arcaro</a>
+        </address>
+<p>In <a href="/category/engineering.html">Engineering</a>.</p>
+<p>tags: <a href="/tag/data-engineering.html">data-engineering</a> <a href="/tag/python.html">python</a> </p>
+</footer><!-- /.post-info -->                <p>Here are my most recent contributions:</p>
+<ul>
+<li><a href="https://github.com/aws/aws-mwaa-local-runner/pull/280">Added Dynamic DAGs example to MWAA local</a> </li>
+</ul>
+                <a class="readmore" href="/using-pelican-and-github-pages.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
                 </ol><!-- /#posts-list -->
