@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>  Understanding the basics of Terraform | Felipe Arcaro
+</title>
+  <link rel="canonical" href="/understanding-the-basics-of-terraform.html">
+
+
+  <link rel="stylesheet" href="/theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/theme/css/fontawesome.min.css">
+  <link rel="stylesheet" href="/theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="/theme/css/theme.css">
+
+  
+  <meta name="description" content="TL;DR Here's the terraform code to: Create an EC2 instance Create an RDS Postgres instance Create an IAM user Generate an IAM policy document in JSON format Attach IAM policy to IAM user # Specify AWS resource terraform { required_providers { aws = { source = "hashicorp/aws" version = "~> 4.0" } } } # Configure the AWS Provider …">
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+<div class="row">
+  <div class="col-sm-12">
+    <h1 class="title"><a href="/">Felipe Arcaro</a></h1>
+  </div>
+</div>    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>  Understanding the basics of Terraform
+</h1>
+      <hr>
+  <article class="article">
+    <header>
+      <ul class="list-inline">
+        <li class="list-inline-item text-muted" title="2023-07-03T13:02:00+02:00">
+          <i class="fas fa-clock"></i>
+          Mon 03 July 2023
+        </li>
+        <li class="list-inline-item">
+          <i class="fas fa-folder-open"></i>
+          <a href="/category/devops.html">DevOps</a>
+        </li>
+          <li class="list-inline-item">
+            <i class="fas fa-tag"></i>
+              <a href="/tag/terraform.html">#terraform</a>,               <a href="/tag/dataops.html">#dataops</a>,               <a href="/tag/devops.html">#devops</a>          </li>
+      </ul>
+    </header>
+    <div class="content">
+      <h2>TL;DR</h2>
+<p>Here's the terraform code to: </p>
+<ul>
+<li>Create an EC2 instance</li>
+<li>Create an RDS Postgres instance</li>
+<li>Create an IAM user</li>
+<li>Generate an IAM policy document in JSON format</li>
+<li>Attach IAM policy to IAM user</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1"># Specify AWS resource</span>
+<span class="nb">terraform</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nb">required_providers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nb">aws</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="na">source</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;hashicorp/aws&quot;</span>
+<span class="w">      </span><span class="na">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;~&gt; 4.0&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1"># Configure the AWS Provider</span>
+<span class="kr">provider</span><span class="w"> </span><span class="nv">&quot;aws&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">region</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;us-east-1&quot;</span>
+<span class="p">}</span>
+
+<span class="c1"># Define where the state will be stored</span>
+<span class="nb">terraform</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kr">backend</span><span class="w"> </span><span class="nv">&quot;local&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.tfstate&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1"># RDS instance</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_db_instance&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_db&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">engine</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;postgres&quot;</span>
+<span class="w">  </span><span class="na">instance_class</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;db.t3.micro&quot;</span>
+<span class="w">  </span><span class="na">username</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sidewalk&quot;</span>
+<span class="w">  </span><span class="na">password</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${var.postgres_pw}&quot;</span>
+<span class="w">  </span><span class="na">allocated_storage</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="m">20</span>
+<span class="w">  </span><span class="na">publicly_accessible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">true</span>
+<span class="p">}</span>
+
+<span class="c1"># EC2 Instance</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_instance&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_ec2&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">instance_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;t2.micro&quot;</span>
+<span class="w">  </span><span class="na">ami</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ami-06e46074ae430fba6&quot;</span>
+<span class="w">  </span><span class="nb">tags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">Name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my-python-project&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1"># IAM policy document in JSON format</span>
+<span class="err">data</span><span class="w"> </span><span class="s2">&quot;aws_iam_policy_document&quot; &quot;my_project_policy&quot;</span><span class="p">{</span>
+<span class="w">    </span><span class="nb">statement</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="na">resources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">aws_instance.my_project_ec2.arn</span><span class="p">]</span>
+<span class="w">        </span><span class="na">actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;ec2:*&quot;</span><span class="p">]</span>
+<span class="w">        </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Allow&quot;</span><span class="c1"> # Default is Allow</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nb">statement</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="na">resources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;aws_db_instance.my_project_db.arn&quot;</span><span class="p">]</span>
+<span class="w">        </span><span class="na">actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;rds:DescribeDBInstances&quot;</span><span class="p">,</span>
+<span class="w">                   </span><span class="s2">&quot;rds:DescribeDBClusters&quot;</span><span class="p">,</span>
+<span class="w">                   </span><span class="s2">&quot;rds:DescribeGlobalClusters&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span><span class="w">             </span>
+<span class="p">}</span>
+
+<span class="c1"># IAM user</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_iam_user&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_user&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my-project-user&quot;</span>
+<span class="p">}</span>
+
+
+<span class="c1"># IAM policy attached to a user</span>
+<span class="err">resource</span><span class="w"> </span><span class="s2">&quot;aws_iam_user_policy&quot; &quot;my_project_user_policy&quot;</span><span class="p">{</span>
+<span class="w">    </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my_project_policy&quot;</span>
+<span class="w">    </span><span class="na">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_iam_user.my_project_user.name</span>
+<span class="w">    </span><span class="na">policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">data.aws_iam_policy_document.my_project_policy.json</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<hr>
+<p>In order to understand the very basics of Terraform, I created a simple Python project and came up with two goals:</p>
+<ul>
+<li>Create an RDS <sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> Postgres instance where my Python project could persist data</li>
+<li>Create an EC2 <sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup> instance where I could deploy my Python code</li>
+</ul>
+<p>Here's the boilerplate code I started with:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Specify AWS resource</span>
+<span class="nb">terraform</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nb">required_providers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nb">aws</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="na">source</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;hashicorp/aws&quot;</span>
+<span class="w">      </span><span class="na">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;~&gt; 4.0&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1"># Configure the AWS Provider</span>
+<span class="kr">provider</span><span class="w"> </span><span class="nv">&quot;aws&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">region</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;us-east-1&quot;</span>
+<span class="p">}</span>
+
+<span class="c1"># Define where the state will be stored</span>
+<span class="nb">terraform</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kr">backend</span><span class="w"> </span><span class="nv">&quot;local&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.tfstate&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h2>What is Terraform?</h2>
+<p>Before we jump into coding things out, let's go over some key concepts.</p>
+<p>Terraform is a tool used in the field of infrastructure as code (IaC) to create and manage your computer resources, such as servers, networks, and databases. It allows you to define your desired infrastructure in a configuration file using a simple and declarative language.</p>
+<p>Once you have defined your infrastructure configuration, Terraform takes care of provisioning and managing the resources for you. It interacts with cloud providers, such as Amazon Web Services (AWS) or Microsoft Azure, to create and update your infrastructure based on the configuration you provided.</p>
+<p>The main advantage of using Terraform is that it enables you to treat your infrastructure as code. This means you can version control your infrastructure configuration, collaborate with others, and easily replicate or rebuild your infrastructure in a consistent and repeatable manner.</p>
+<p>And since we're going to be provisioning infrastructure in AWS, it's important also important to understand the difference between a source, an instance, and a service.</p>
+<ul>
+<li>A <strong>resource</strong> is a logical entity that represents a piece of AWS infrastructure – an S3 bucket, an EC2 instance, an RDS database</li>
+<li>An <strong>instance</strong> is a specific occurrence of a resource that is created from a particular template or configuration – an  EC2 instance is a virtual server that is launched from an Amazon Machine Image (AMI). Each instance is a unique copy of the AMI, with its own IP address, storage, and other attributes</li>
+<li>A <strong>service</strong> is a collection of related AWS resources and API operations that work together to perform a specific function – AWS offers over 200 different services, including compute, storage, database, analytics, machine learning, and more.</li>
+</ul>
+<h2>Getting the environment ready</h2>
+<p>There are a few steps I needed to go through in order to get my developer environment ready: </p>
+<ul>
+<li>Install <a href="https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html">AWS CLI</a><ul>
+<li>Run <code>aws configure</code> on the terminal and provide the following parameters<ul>
+<li><code>AWS Access Key ID</code> </li>
+<li><code>AWS Secret Access Key</code></li>
+<li><code>Default region name</code></li>
+<li><code>Default output format</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Install <a href="https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli">Terraform</a></li>
+</ul>
+<h2>Project structure</h2>
+<p>Here's the project structure:</p>
+<div class="highlight"><pre><span></span><code>my-project/
+├── app.py
+└── terraform/
+    └── main.tf
+</code></pre></div>
+
+<p>To start my Terraform project, I navigated to the <em>my-project/terraform/</em> directory and ran <code>terraform init</code> which essentially downloads all necessary modules and defines the backend.</p>
+<h2>Wait, what is this backend thing?</h2>
+<p>To understand what the Terraform backend is, let's quickly cover what a Terraform state is first.</p>
+<p>You probably saw some state-related code in the code snippet I provided earlier:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Define where the state will be stored</span>
+<span class="nb">terraform</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kr">backend</span><span class="w"> </span><span class="nv">&quot;local&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.tfstate&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Once a Terraform project is started, the state of the managed infrastructure and configuration needs to be stored somewhere. The state is used by Terraform essentially to map real-world resources to my configuration and keep track of metadata.</p>
+<p>Here are some of Terraform state's key aspects:</p>
+<ul>
+<li>Its primary purpose is to store bindings between objects in a remote system (e.g. an EC2 instance) and resource instances declared in a configuration file</li>
+<li>It's generally saved in a file called <code>terraform.tfstate</code></li>
+<li>It can be stored locally as you saw in the boilerplate code I provided earlier. This is recommended for developing purposes</li>
+<li>It can be stored in the cloud – e.g. in a s3 bucket. This is recommended for deployment purposes, so it can be versioned, encrypted, and securely shared</li>
+</ul>
+<p>The backend simply defines where Terraform stores its state data files (local or remote).</p>
+<h2>How to "run" terraform code</h2>
+<p>Before I jump into actually creating the AWS resources, I want to quickly go over some very important terraform commands:</p>
+<ul>
+<li><code>terraform plan</code></li>
+<li><code>terraform apply</code></li>
+<li><code>terraform destroy</code></li>
+<li><code>terraform show</code></li>
+<li><code>terraform import</code></li>
+</ul>
+<h3>Terraform plan</h3>
+<p>The <code>terraform plan</code> command, as the name states, creates a plan. It can be used to preview the planned changes to the infrastructure.</p>
+<p>Under the hood, the command:</p>
+<ul>
+<li>Reads the current state of any remote objects to make sure that the Terraform state is up-to-date</li>
+<li>Compares the current configuration to the prior state and notes any differences</li>
+<li>Proposes a set of change actions that should, if applied, make the remote objects match the configuration</li>
+</ul>
+<h3>Terraform apply</h3>
+<p>The <code>terraform plan</code> command, as the name states, applies the changes to the infrastructure. <code>terraform apply</code> can be run without running <code>terraform plan</code> first although it's not recommended.</p>
+<h3>Terraform destroy</h3>
+<p>The <code>terraform destroy</code> command can be used to destroy all objects in the infrastructure. <code>terraform plan -destroy</code> can be used to see what destruction will be made beforehand.</p>
+<p>It is also worth mentioning that if the infrastructure has already been provisioned with <code>terraform apply</code>, removing objects from the Terraform code and running <code>terraform apply</code> will also destroy them.</p>
+<h3>Terraform show</h3>
+<p>The <code>terraform show</code> command can be used at any time to inspect the configuration of a Terraform state or plan.</p>
+<h3>Terraform import</h3>
+<p>The <code>terraform import</code> command can be used for bringing existing resources under Terraform management.</p>
+<h2>Creating an RDS instance</h2>
+<p>First, I created a free RDS Postgres instance through the Management Console. Since this was the first AWS service on this account, it automatically created a VPC <sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup> and a Security Group <sup id="fnref:4"><a class="footnote-ref" href="#fn:4">4</a></sup> to ensure the instance was securely isolated and protected by a firewall.</p>
+<p>To see if the database was working, I used PGAdmin, but I also needed to make sure of a few things:</p>
+<ul>
+<li>Make the RDS instance  publicly available</li>
+<li>Added my personal IP to the Security Group's inbound rules used by the database so I could connect to it from outside the VPC:<ul>
+<li>Although not recommended, I could have added all ports <code>0-655353</code> and all IPs <code>0.0.0.0/0</code> to the inbound rules</li>
+</ul>
+</li>
+</ul>
+<p>Everything seems to be working as expected. </p>
+<p>Now, I will use <code>terraform import</code> to import it to my terraform file so I can manage it from there.</p>
+<p>First, I have to create the most basic version of the <code>aws_db_instance</code> resource on my Terraform file:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_db_instance&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_db&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">engine</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;postgres&quot;</span>
+<span class="w">  </span><span class="na">instance_class</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;db.t2.micro&quot;</span>
+<span class="w">  </span><span class="na">username</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sidewalk&quot;</span>
+<span class="w">  </span><span class="na">password</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${var.postgres_pw}&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>You probably noticed I am using a variable instead of writing my password in plain text. Here's the easiest way to do it:</p>
+<ul>
+<li>Create a file called <code>vars.tf</code> in the same folder as the <code>main.tf</code> file:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kr">variable</span><span class="w"> </span><span class="nv">&quot;super_secret_password&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ThisPassword123!&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Call it from your main terraform code like this <code>${var.super_secret_password}</code></p>
+<p>Then I run <code>terraform import aws_instance.my-project-db &lt;db-instance-id&gt;</code> - and it said it was imported successfully.</p>
+<p>There was a problem though - the database I created through the admin console had the parameter <code>instance_class = db.t3.micro</code> while my terraform code said <code>instance_class = db.t2.micro</code> so, when I ran <code>terraform plan</code> it says that particular resource <em>must be replaced</em>.</p>
+<p>Then, when I ran <code>terraform apply</code>, the database I created through the Management Console was deleted and I got an error saying there were some important parameters missing to create the new one.</p>
+<h3>Key learnings on using <code>terraform import</code>:</h3>
+<ul>
+<li>To import an existing infrastructure from AWS, you must have the resource in the terraform code with all required parameters</li>
+<li>Make sure the configuration you have on your terraform code matches what you have on AWS</li>
+<li><code>terraform plan</code> won't show if there are required parameters missing, only <code>terraform apply</code></li>
+</ul>
+<p>Now that I know how this works, I'll create the database directly from my terraform code using <a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_instance">AWS documentation on <code>aws_db_instance</code></a></p>
+<div class="highlight"><pre><span></span><code><span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_db_instance&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_db&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">engine</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;postgres&quot;</span>
+<span class="w">  </span><span class="na">instance_class</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;db.t3.micro&quot;</span>
+<span class="w">  </span><span class="na">username</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sidewalk&quot;</span>
+<span class="w">  </span><span class="na">password</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${var.postgres_pw}&quot;</span>
+<span class="w">  </span><span class="na">allocated_storage</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="m">20</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>I ran <code>terraform plan</code> to make sure everything was looking good and <code>terraform apply</code> to create the infrastructure. After my database was created, I typed <code>terraform show</code> to see my infrastructure current state – the VPC, the Security Group, etc.</p>
+<h3>Key learnings on creating infrastructure using Terraform code:</h3>
+<ul>
+<li>It automatically created it on the only VPC available on that AWS account</li>
+<li>It automatically assigned the RDS instance to the only Security Group available on that AWS account</li>
+</ul>
+<p>And here's the updated Terraform code to make the RDS instance publicly accessible:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># RDS instance</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_db_instance&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_db&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">engine</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;postgres&quot;</span>
+<span class="w">  </span><span class="na">instance_class</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;db.t3.micro&quot;</span>
+<span class="w">  </span><span class="na">username</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sidewalk&quot;</span>
+<span class="w">  </span><span class="na">password</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${var.postgres_pw}&quot;</span>
+<span class="w">  </span><span class="na">allocated_storage</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="m">20</span>
+<span class="w">  </span><span class="na">publicly_accessible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">true</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h2>EC2 Instance (Elastic Compute Cloud)</h2>
+<p>Now that I am a bit more comfortable Terraform, I will go ahead and create an EC2 instance. Here's the code I have:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_instance&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_ec2&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">instance_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;t2.micro&quot;</span>
+<span class="w">  </span><span class="na">ami</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ami-06e46074ae430fba6&quot;</span>
+<span class="w">  </span><span class="nb">tags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">Name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my-python-project&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><em>Amazon Machine Image (AMI) – Pre-configured image to create an EC2 instance</em></p>
+<p>Once again, my infrastructure was updated after I ran <code>terraform plan</code> and <code>terraform apply</code> and a new EC2 instance was created.</p>
+<h3>Key learnings on resource name:</h3>
+<ul>
+<li>The resource name <code>my-python-project</code> that comes after the resource type <code>aws_instance</code> is not the same as the resource name that appears in the Admin Console. For that, I had to use <code>tags</code> parameter.</li>
+</ul>
+<h2>Managing access</h2>
+<p>Now that my infrastructure is ready, I want to create an IAM <sup id="fnref:5"><a class="footnote-ref" href="#fn:5">5</a></sup> user with specific (and restricted) access to use the infrastructure. Here are the steps I will need to go through:</p>
+<ul>
+<li>Create a policy</li>
+<li>Create an IAM user</li>
+<li>Attach the policy to the user</li>
+</ul>
+<p>Let's start creating the policies:</p>
+<div class="highlight"><pre><span></span><code><span class="err">data</span><span class="w"> </span><span class="s2">&quot;aws_iam_policy_document&quot; &quot;my_project_policy&quot;</span><span class="p">{</span>
+<span class="w">    </span><span class="nb">statement</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="na">resources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">aws_instance.my_project_ec2.arn</span><span class="p">]</span>
+<span class="w">        </span><span class="na">actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;ec2:*&quot;</span><span class="p">]</span>
+<span class="w">        </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Allow&quot;</span><span class="c1"> # Default is Allow</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nb">statement</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="na">resources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;aws_db_instance.my_project_db.arn&quot;</span><span class="p">]</span>
+<span class="w">        </span><span class="na">actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;rds:DescribeDBInstances&quot;</span><span class="p">,</span>
+<span class="w">                   </span><span class="s2">&quot;rds:DescribeDBClusters&quot;</span><span class="p">,</span>
+<span class="w">                   </span><span class="s2">&quot;rds:DescribeGlobalClusters&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span><span class="w">             </span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Now we create the user:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Provides an IAM user</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_iam_user&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_user&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my-project-user&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>And attach those policies to the user:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Provides an IAM policy attached to a user</span>
+<span class="err">resource</span><span class="w"> </span><span class="s2">&quot;aws_iam_user_policy&quot; &quot;my_project_user_policy&quot;</span><span class="p">{</span>
+<span class="w">    </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my_project_policy&quot;</span>
+<span class="w">    </span><span class="na">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_iam_user.my_project_user.name</span>
+<span class="w">    </span><span class="na">policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">data.aws_iam_policy_document.my_project_user_policy.json</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h2>Wrapping up</h2>
+<p>After going through all those steps, here's what I've got:</p>
+<ul>
+<li>An EC2 instance where I can deploy my Python project</li>
+<li>A RDS Postgres instance where that Python project can persist that</li>
+<li>An IAM user with proper permissions to interact with the EC2 and RDS instances</li>
+</ul>
+<div class="footnote">
+<hr>
+<ol>
+<li id="fn:1">
+<p>RDS – Amazon Relational Database Service is a managed database service provided by AWS that simplifies the process of setting up, operating, and scaling a relational database in the cloud.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>EC2 – Elastic Compute Cloud is a virtual server provided by AWS that allows you to run applications and services in the cloud.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>VPC – Virtual Private Cloud is a virtual network infrastructure that allows you to create a logically isolated network environment. It is essentially a virtual data center in the cloud&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:4">
+<p>A Security Group is a virtual firewall that controls the inbound and outbound traffic for one or more instances. Every instance within a VPC in AWS must be associated with at least one security group.&#160;<a class="footnote-backref" href="#fnref:4" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:5">
+<p>IAM - Identity and Access Management is a service that allows you to manage access to AWS resources securely. IAM enables you to create and manage AWS users and groups and control their level of access to AWS resources.&#160;<a class="footnote-backref" href="#fnref:5" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+    </div>
+  </article>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+<div class="row">
+  <ul class="col-sm-6 list-inline">
+      <li class="list-inline-item"><a href="/authors.html">Authors</a></li>
+    <li class="list-inline-item"><a href="/archives.html">Archives</a></li>
+    <li class="list-inline-item"><a href="/categories.html">Categories</a></li>
+      <li class="list-inline-item"><a href="/tags.html">Tags</a></li>
+  </ul>
+  <p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+  </p>
+</div>    </div>
+  </footer>
+
+</body>
+
+</html>
