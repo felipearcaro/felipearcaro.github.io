@@ -1,60 +1,51 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
-
 <head>
-  <!-- Required meta tags -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-  <title>  Understanding the basics of Terraform | Felipe Arcaro
+<!-- Required meta tags -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+<title>  Understanding the basics of Terraform | Felipe Arcaro
 </title>
-  <link rel="canonical" href="/understanding-the-basics-of-terraform.html">
-
-
-  <link rel="stylesheet" href="/theme/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/theme/css/fontawesome.min.css">
-  <link rel="stylesheet" href="/theme/css/pygments/default.min.css">
-  <link rel="stylesheet" href="/theme/css/theme.css">
-
-  
-  <meta name="description" content="Unlocking the mysteries of Terraform – sort of.">
-
-
+<link href="/understanding-the-basics-of-terraform.html" rel="canonical"/>
+<link href="/theme/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/theme/css/fontawesome.min.css" rel="stylesheet"/>
+<link href="/theme/css/pygments/default.min.css" rel="stylesheet"/>
+<link href="/theme/css/theme.css" rel="stylesheet"/>
+<meta content="Unlocking the mysteries of Terraform – sort of." name="description"/>
 </head>
-
 <body>
-  <header class="header">
-    <div class="container">
+<header class="header">
+<div class="container">
 <div class="row">
-  <div class="col-sm-12">
-    <h1 class="title"><a href="/">Felipe Arcaro</a></h1>
-  </div>
-</div>    </div>
-  </header>
-
-  <div class="main">
-    <div class="container">
-      <h1>  Understanding the basics of Terraform
+<div class="col-sm-12">
+<h1 class="title"><a href="/">Felipe Arcaro</a></h1>
+</div>
+</div> </div>
+</header>
+<div class="main">
+<div class="container">
+<h1>  Understanding the basics of Terraform
 </h1>
-      <hr>
-  <article class="article">
-    <header>
-      <ul class="list-inline">
-        <li class="list-inline-item text-muted" title="2023-07-10T22:34:00+02:00">
-          <i class="fas fa-clock"></i>
+<hr/>
+<article class="article">
+<header>
+<ul class="list-inline">
+<li class="list-inline-item text-muted" title="2023-07-10T22:34:00+02:00">
+<i class="fas fa-clock"></i>
           Mon 10 July 2023
         </li>
-        <li class="list-inline-item">
-          <i class="fas fa-folder-open"></i>
-          <a href="/category/devops.html">DevOps</a>
-        </li>
-          <li class="list-inline-item">
-            <i class="fas fa-tag"></i>
-              <a href="/tag/terraform.html">#terraform</a>,               <a href="/tag/dataops.html">#dataops</a>,               <a href="/tag/devops.html">#devops</a>          </li>
-      </ul>
-    </header>
-    <div class="content">
-      <h2>TL;DR</h2>
+<li class="list-inline-item">
+<i class="fas fa-folder-open"></i>
+<a href="/category/devops.html">DevOps</a>
+</li>
+<li class="list-inline-item">
+<i class="fas fa-tag"></i>
+<a href="/tag/terraform.html">#terraform</a>,               <a href="/tag/dataops.html">#dataops</a>,               <a href="/tag/devops.html">#devops</a> </li>
+</ul>
+</header>
+<div class="content">
+<h2>TL;DR</h2>
 <p>Here's the terraform code to: </p>
 <ul>
 <li>Create an EC2 instance</li>
@@ -67,57 +58,57 @@
 <span class="nb">terraform</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="nb">required_providers</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nb">aws</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="na">source</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;hashicorp/aws&quot;</span>
-<span class="w">      </span><span class="na">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;~&gt; 4.0&quot;</span>
+<span class="w">      </span><span class="na">source</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">"hashicorp/aws"</span>
+<span class="w">      </span><span class="na">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"~&gt; 4.0"</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 
 <span class="c1"># Configure the AWS Provider</span>
-<span class="kr">provider</span><span class="w"> </span><span class="nv">&quot;aws&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="na">region</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;us-east-1&quot;</span>
+<span class="kr">provider</span><span class="w"> </span><span class="nv">"aws"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">region</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"us-east-1"</span>
 <span class="p">}</span>
 
 <span class="c1"># Define where the state will be stored</span>
 <span class="nb">terraform</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kr">backend</span><span class="w"> </span><span class="nv">&quot;local&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="na">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.tfstate&quot;</span>
+<span class="w">  </span><span class="kr">backend</span><span class="w"> </span><span class="nv">"local"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">".tfstate"</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 
 <span class="c1"># RDS instance</span>
-<span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_db_instance&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_db&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="na">engine</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;postgres&quot;</span>
-<span class="w">  </span><span class="na">instance_class</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;db.t3.micro&quot;</span>
-<span class="w">  </span><span class="na">username</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sidewalk&quot;</span>
-<span class="w">  </span><span class="na">password</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${var.postgres_pw}&quot;</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_db_instance"</span><span class="w"> </span><span class="nv">"my_project_db"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">engine</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="s2">"postgres"</span>
+<span class="w">  </span><span class="na">instance_class</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">"db.t3.micro"</span>
+<span class="w">  </span><span class="na">username</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">"sidewalk"</span>
+<span class="w">  </span><span class="na">password</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">"${var.postgres_pw}"</span>
 <span class="w">  </span><span class="na">allocated_storage</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="m">20</span>
 <span class="w">  </span><span class="na">publicly_accessible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">true</span>
 <span class="p">}</span>
 
 <span class="c1"># EC2 Instance</span>
-<span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_instance&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_ec2&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="na">instance_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;t2.micro&quot;</span>
-<span class="w">  </span><span class="na">ami</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ami-06e46074ae430fba6&quot;</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_instance"</span><span class="w"> </span><span class="nv">"my_project_ec2"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">instance_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"t2.micro"</span>
+<span class="w">  </span><span class="na">ami</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ami-06e46074ae430fba6"</span>
 <span class="w">  </span><span class="nb">tags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="na">Name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my-python-project&quot;</span>
+<span class="w">    </span><span class="na">Name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-python-project"</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 
 
 <span class="c1"># IAM role for EC2 instance</span>
-<span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_iam_role&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_role&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my-project-role&quot;</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_iam_role"</span><span class="w"> </span><span class="nv">"my_project_role"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-role"</span>
 
 <span class="w">  </span><span class="na">assume_role_policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">jsonencode</span><span class="p">({</span>
-<span class="w">    </span><span class="na">Version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;2012-10-17&quot;</span>
+<span class="w">    </span><span class="na">Version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"2012-10-17"</span>
 <span class="w">    </span><span class="na">Statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="na">Action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sts:AssumeRole&quot;</span>
-<span class="w">        </span><span class="na">Effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Allow&quot;</span>
-<span class="w">        </span><span class="na">Sid</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">        </span><span class="na">Action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"sts:AssumeRole"</span>
+<span class="w">        </span><span class="na">Effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Allow"</span>
+<span class="w">        </span><span class="na">Sid</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s2">""</span>
 <span class="w">        </span><span class="nb">Principal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="na">Service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ec2.amazonaws.com&quot;</span>
+<span class="w">          </span><span class="na">Service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ec2.amazonaws.com"</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">]</span>
@@ -125,18 +116,18 @@
 <span class="p">}</span>
 
 <span class="c1"># IAM policy to be attached to the EC2 role</span>
-<span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_iam_role_policy&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_role_policy&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my-project-role-policy&quot;</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_iam_role_policy"</span><span class="w"> </span><span class="nv">"my_project_role_policy"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-role-policy"</span>
 <span class="w">  </span><span class="na">role</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_iam_role.my_project_role.id</span>
 
 <span class="w">  </span><span class="na">policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">jsonencode</span><span class="p">({</span>
-<span class="w">    </span><span class="na">Version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;2012-10-17&quot;</span>
+<span class="w">    </span><span class="na">Version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"2012-10-17"</span>
 <span class="w">    </span><span class="na">Statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
 <span class="w">        </span><span class="na">Action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
-<span class="w">          </span><span class="s2">&quot;rds:*&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="s2">"rds:*"</span><span class="p">,</span>
 <span class="w">        </span><span class="p">]</span>
-<span class="w">        </span><span class="na">Effect</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Allow&quot;</span>
+<span class="w">        </span><span class="na">Effect</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s2">"Allow"</span>
 <span class="w">        </span><span class="na">Resource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_db_instance.my_project_db.arn</span>
 <span class="w">      </span><span class="p">},</span>
 <span class="w">    </span><span class="p">]</span>
@@ -144,35 +135,34 @@
 <span class="p">}</span>
 
 <span class="c1"># IAM policy document in JSON format</span>
-<span class="kr">data</span><span class="w"> </span><span class="nc">&quot;aws_iam_policy_document&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_policy&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="kr">data</span><span class="w"> </span><span class="nc">"aws_iam_policy_document"</span><span class="w"> </span><span class="nv">"my_project_policy"</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nb">statement</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="na">resources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">aws_instance.my_project_ec2.arn</span><span class="p">]</span>
-<span class="w">        </span><span class="na">actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;ec2:*&quot;</span><span class="p">]</span>
-<span class="w">        </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Allow&quot;</span><span class="c1"> # Default is Allow</span>
+<span class="w">        </span><span class="na">actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"ec2:*"</span><span class="p">]</span>
+<span class="w">        </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Allow"</span><span class="c1"> # Default is Allow</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="nb">statement</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="na">resources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;aws_db_instance.my_project_db.arn&quot;</span><span class="p">]</span>
-<span class="w">        </span><span class="na">actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;rds:DescribeDBInstances&quot;</span><span class="p">,</span>
-<span class="w">                   </span><span class="s2">&quot;rds:DescribeDBClusters&quot;</span><span class="p">,</span>
-<span class="w">                   </span><span class="s2">&quot;rds:DescribeGlobalClusters&quot;</span><span class="p">]</span>
+<span class="w">        </span><span class="na">resources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"aws_db_instance.my_project_db.arn"</span><span class="p">]</span>
+<span class="w">        </span><span class="na">actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"rds:DescribeDBInstances"</span><span class="p">,</span>
+<span class="w">                   </span><span class="s2">"rds:DescribeDBClusters"</span><span class="p">,</span>
+<span class="w">                   </span><span class="s2">"rds:DescribeGlobalClusters"</span><span class="p">]</span>
 <span class="w">    </span><span class="p">}</span><span class="w">             </span>
 <span class="p">}</span>
 
 <span class="c1"># IAM user</span>
-<span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_iam_user&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_user&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my-project-user&quot;</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_iam_user"</span><span class="w"> </span><span class="nv">"my_project_user"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-user"</span>
 <span class="p">}</span>
 
 <span class="c1"># IAM policy attached to a user</span>
-<span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_iam_user_policy&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_user_policy&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my-project-policy&quot;</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_iam_user_policy"</span><span class="w"> </span><span class="nv">"my_project_user_policy"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-policy"</span>
 <span class="w">    </span><span class="na">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_iam_user.my_project_user.name</span>
 <span class="w">    </span><span class="na">policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">data.aws_iam_policy_document.my_project_policy.json</span>
 <span class="p">}</span>
 </code></pre></div>
-
-<hr>
+<hr/>
 <p>To understand the very basics of Terraform, let's imagine we have a simple Python project and two goals:</p>
 <ul>
 <li>Create an AWS RDS <sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> Postgres instance where this Python project could persist data</li>
@@ -183,25 +173,24 @@
 <span class="nb">terraform</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="nb">required_providers</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nb">aws</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="na">source</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;hashicorp/aws&quot;</span>
-<span class="w">      </span><span class="na">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;~&gt; 4.0&quot;</span>
+<span class="w">      </span><span class="na">source</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">"hashicorp/aws"</span>
+<span class="w">      </span><span class="na">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"~&gt; 4.0"</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 
 <span class="c1"># Configure the AWS Provider</span>
-<span class="kr">provider</span><span class="w"> </span><span class="nv">&quot;aws&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="na">region</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;us-east-1&quot;</span>
+<span class="kr">provider</span><span class="w"> </span><span class="nv">"aws"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">region</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"us-east-1"</span>
 <span class="p">}</span>
 
 <span class="c1"># Define where the state will be stored</span>
 <span class="nb">terraform</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kr">backend</span><span class="w"> </span><span class="nv">&quot;local&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="na">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.tfstate&quot;</span>
+<span class="w">  </span><span class="kr">backend</span><span class="w"> </span><span class="nv">"local"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">".tfstate"</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <h2>What is Terraform?</h2>
 <p>Before we jump into coding things out, let's go over some key concepts of Terraform.</p>
 <p>Terraform is a tool used in the field of infrastructure as code (IaC) to create and manage computer resources – servers, networks, databases, and so on. It allows us to define a desired infrastructure in a configuration file using a simple and declarative language.</p>
@@ -235,19 +224,17 @@
 └── terraform/
     └── main.tf
 </code></pre></div>
-
 <p>To start the Terraform project, we navigate to the <em>my-project/terraform/</em> directory and ran <code>terraform init</code> which essentially downloads all necessary modules and defines the backend.</p>
 <h2>Wait, what is this backend thing?</h2>
 <p>To understand what the Terraform backend is, let's quickly cover what a Terraform state is first.</p>
 <p>You probably saw some state-related code in the code snippet I provided earlier:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Define where the state will be stored</span>
 <span class="nb">terraform</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kr">backend</span><span class="w"> </span><span class="nv">&quot;local&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="na">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.tfstate&quot;</span>
+<span class="w">  </span><span class="kr">backend</span><span class="w"> </span><span class="nv">"local"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">".tfstate"</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>Once a Terraform project is started, the state of the managed infrastructure and configuration needs to be stored somewhere, and that state is used by Terraform essentially to map real-world resources to our configuration file and keep track of metadata.</p>
 <p>Here are some key aspects of the Terraform state:</p>
 <ul>
@@ -299,23 +286,21 @@
 <h3>Importing existing resources to Terraform code</h3>
 <p>Now, let's start with <code>terraform import</code> to import my database instance to my configuration file so I can manage it from there.</p>
 <p>First, we create the most basic version of the <code>aws_db_instance</code> resource on our Terraform <code>main.tf</code> file:</p>
-<div class="highlight"><pre><span></span><code><span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_db_instance&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_db&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="na">engine</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;postgres&quot;</span>
-<span class="w">  </span><span class="na">instance_class</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;db.t2.micro&quot;</span>
-<span class="w">  </span><span class="na">username</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sidewalk&quot;</span>
-<span class="w">  </span><span class="na">password</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${var.postgres_pw}&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_db_instance"</span><span class="w"> </span><span class="nv">"my_project_db"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">engine</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="s2">"postgres"</span>
+<span class="w">  </span><span class="na">instance_class</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">"db.t2.micro"</span>
+<span class="w">  </span><span class="na">username</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">"sidewalk"</span>
+<span class="w">  </span><span class="na">password</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">"${var.postgres_pw}"</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>You probably noticed we're using a variable instead of writing the password in plain text. Here's the easiest way to do it:</p>
 <ul>
 <li>Create a file called <code>vars.tf</code> in the same folder as the <code>main.tf</code> file and add the following code to it:</li>
 </ul>
-<div class="highlight"><pre><span></span><code><span class="kr">variable</span><span class="w"> </span><span class="nv">&quot;super_secret_password&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="na">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ThisPassword123!&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="kr">variable</span><span class="w"> </span><span class="nv">"super_secret_password"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ThisPassword123!"</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>Now you can call it from your main terraform code like this <code>${var.super_secret_password}</code></p>
 <p>Ok, now it's time to run <code>terraform import aws_instance.my_project_db &lt;db-instance-id&gt;</code> (you can find the <code>&lt;db-instance-id&gt;</code> in the Management Console) – it seems like the database was imported successfully.</p>
 <p>There was a small problem though – the database we created through the Management Console had the parameter <code>instance_class = db.t3.micro</code> while our Terraform code had <code>instance_class = db.t2.micro</code>. </p>
@@ -328,15 +313,14 @@
 </ul>
 <h3>Creating resources from Terraform code</h3>
 <p>Now that we know how this works, let's go ahead and create the database directly from the Terraform code using <a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_instance">AWS documentation</a> on <code>aws_db_instance</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_db_instance&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_db&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="na">engine</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;postgres&quot;</span>
-<span class="w">  </span><span class="na">instance_class</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;db.t3.micro&quot;</span>
-<span class="w">  </span><span class="na">username</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sidewalk&quot;</span>
-<span class="w">  </span><span class="na">password</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${var.postgres_pw}&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_db_instance"</span><span class="w"> </span><span class="nv">"my_project_db"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">engine</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="s2">"postgres"</span>
+<span class="w">  </span><span class="na">instance_class</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">"db.t3.micro"</span>
+<span class="w">  </span><span class="na">username</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">"sidewalk"</span>
+<span class="w">  </span><span class="na">password</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">"${var.postgres_pw}"</span>
 <span class="w">  </span><span class="na">allocated_storage</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="m">20</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>We can run <code>terraform plan</code> to make sure everything is looking good and <code>terraform apply</code> to create the database. After the database is created, we can type <code>terraform show</code> to see the infrastructure's current state – the VPC, the Security Group, etc.</p>
 <h4>Key learnings on creating infrastructure using Terraform code:</h4>
 <ul>
@@ -345,27 +329,25 @@
 </ul>
 <p>And here's the updated Terraform code to make the RDS instance publicly accessible:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># RDS instance</span>
-<span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_db_instance&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_db&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="na">engine</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;postgres&quot;</span>
-<span class="w">  </span><span class="na">instance_class</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;db.t3.micro&quot;</span>
-<span class="w">  </span><span class="na">username</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sidewalk&quot;</span>
-<span class="w">  </span><span class="na">password</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${var.postgres_pw}&quot;</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_db_instance"</span><span class="w"> </span><span class="nv">"my_project_db"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">engine</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="s2">"postgres"</span>
+<span class="w">  </span><span class="na">instance_class</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">"db.t3.micro"</span>
+<span class="w">  </span><span class="na">username</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">"sidewalk"</span>
+<span class="w">  </span><span class="na">password</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">"${var.postgres_pw}"</span>
 <span class="w">  </span><span class="na">allocated_storage</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="m">20</span>
 <span class="w">  </span><span class="na">publicly_accessible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">true</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <h2>EC2 Instance (Elastic Compute Cloud)</h2>
 <p>We're past the basics and almost done! Now, let's create an EC2 instance. Here's the code to do it:</p>
-<div class="highlight"><pre><span></span><code><span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_instance&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_ec2&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="na">instance_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;t2.micro&quot;</span>
-<span class="w">  </span><span class="na">ami</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ami-06e46074ae430fba6&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_instance"</span><span class="w"> </span><span class="nv">"my_project_ec2"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">instance_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"t2.micro"</span>
+<span class="w">  </span><span class="na">ami</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ami-06e46074ae430fba6"</span>
 <span class="w">  </span><span class="nb">tags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="na">Name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my-python-project&quot;</span>
+<span class="w">    </span><span class="na">Name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-python-project"</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p><em>Amazon Machine Image (AMI) – Pre-configured image to create an EC2 instance</em></p>
 <p>Once again, the infrastructure is updated after we run <code>terraform plan</code> and <code>terraform apply</code> and a new EC2 instance is created.</p>
 <h4>Key learnings on resource name:</h4>
@@ -389,58 +371,55 @@
 </ul>
 <p>Let's start creating an IAM role for our EC2 service:</p>
 <div class="highlight"><pre><span></span><code>#<span class="w"> </span><span class="nv">IAM</span><span class="w"> </span><span class="nv">role</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">EC2</span><span class="w"> </span><span class="nv">instance</span>
-<span class="nv">resource</span><span class="w"> </span><span class="s2">&quot;aws_iam_role&quot;</span><span class="w"> </span><span class="s2">&quot;my_project_role&quot;</span><span class="w"> </span>{
-<span class="w">  </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my-project-role&quot;</span>
+<span class="nv">resource</span><span class="w"> </span><span class="s2">"aws_iam_role"</span><span class="w"> </span><span class="s2">"my_project_role"</span><span class="w"> </span>{
+<span class="w">  </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-role"</span>
 
 <span class="w">  </span><span class="nv">assume_role_policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">jsonencode</span><span class="ss">(</span>{
-<span class="w">    </span><span class="nv">Version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;2012-10-17&quot;</span>
+<span class="w">    </span><span class="nv">Version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"2012-10-17"</span>
 <span class="w">    </span><span class="nv">Statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>[
 <span class="w">      </span>{
-<span class="w">        </span><span class="nv">Action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sts:AssumeRole&quot;</span>
-<span class="w">        </span><span class="nv">Effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Allow&quot;</span>
-<span class="w">        </span><span class="nv">Sid</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">        </span><span class="nv">Action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"sts:AssumeRole"</span>
+<span class="w">        </span><span class="nv">Effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Allow"</span>
+<span class="w">        </span><span class="nv">Sid</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s2">""</span>
 <span class="w">        </span><span class="nv">Principal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>{
-<span class="w">          </span><span class="nv">Service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ec2.amazonaws.com&quot;</span>
+<span class="w">          </span><span class="nv">Service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ec2.amazonaws.com"</span>
 <span class="w">        </span>}
 <span class="w">      </span>}
 <span class="w">    </span>]
 <span class="w">  </span>}<span class="ss">)</span>
 }
 </code></pre></div>
-
 <p>And now we create a policy with all permissions to our RDS instance and reference the role we just created.</p>
 <div class="highlight"><pre><span></span><code># IAM policy to be attached to the EC2 role
-resource &quot;aws_iam_role_policy&quot; &quot;my_project_role_policy&quot; {
-  name = &quot;my-project-role-policy&quot;
+resource "aws_iam_role_policy" "my_project_role_policy" {
+  name = "my-project-role-policy"
   role = aws_iam_role.my_project_role.id
 
   policy = jsonencode({
-    Version = &quot;2012-10-17&quot;
+    Version = "2012-10-17"
     Statement = [
       {
         Action = [
-          &quot;rds:*&quot;,
+          "rds:*",
         ]
-        Effect   = &quot;Allow&quot;
+        Effect   = "Allow"
         Resource = aws_db_instance.my_project_db.arn
       },
     ]
   })
 }
 </code></pre></div>
-
 <p>Now we have to update our EC2 instance code to make sure it uses the role and permissions we just defined. For that, we just add <code>iam_instance_profile = aws_iam_role.my_project_role.arn</code> to it:</p>
-<div class="highlight"><pre><span></span><code><span class="nx">resource</span><span class="w"> </span><span class="s">&quot;aws_instance&quot;</span><span class="w"> </span><span class="s">&quot;my_project_ec2&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nx">instance_type</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;t2.micro&quot;</span>
-<span class="w">  </span><span class="nx">ami</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;ami-06e46074ae430fba6&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="nx">resource</span><span class="w"> </span><span class="s">"aws_instance"</span><span class="w"> </span><span class="s">"my_project_ec2"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">instance_type</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"t2.micro"</span>
+<span class="w">  </span><span class="nx">ami</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"ami-06e46074ae430fba6"</span>
 <span class="w">  </span><span class="nx">tags</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">Name</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;my-python-project&quot;</span>
+<span class="w">    </span><span class="nx">Name</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"my-python-project"</span>
 <span class="w">  </span><span class="p">}</span>
 
 <span class="w">  </span><span class="nx">iam_instance_profile</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">aws_iam_role</span><span class="p">.</span><span class="nx">my_project_role</span><span class="p">.</span><span class="nx">arn</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <h3>Creating an IAM user</h3>
 <p>Here are the things we'll need to add to our Terraform code:</p>
 <ul>
@@ -449,39 +428,36 @@ resource &quot;aws_iam_role_policy&quot; &quot;my_project_role_policy&quot; {
 <li>Combine the two above</li>
 </ul>
 <p>Let's start creating the policy:</p>
-<div class="highlight"><pre><span></span><code><span class="kr">data</span><span class="w"> </span><span class="nc">&quot;aws_iam_policy_document&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_policy&quot;</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight"><pre><span></span><code><span class="kr">data</span><span class="w"> </span><span class="nc">"aws_iam_policy_document"</span><span class="w"> </span><span class="nv">"my_project_policy"</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nb">statement</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="na">resources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">aws_instance.my_project_ec2.arn</span><span class="p">]</span>
-<span class="w">        </span><span class="na">actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;ec2:*&quot;</span><span class="p">]</span>
-<span class="w">        </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Allow&quot;</span><span class="c1"> # Default is Allow</span>
+<span class="w">        </span><span class="na">actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"ec2:*"</span><span class="p">]</span>
+<span class="w">        </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Allow"</span><span class="c1"> # Default is Allow</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="nb">statement</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="na">resources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;aws_db_instance.my_project_db.arn&quot;</span><span class="p">]</span>
-<span class="w">        </span><span class="na">actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;rds:DescribeDBInstances&quot;</span><span class="p">,</span>
-<span class="w">                   </span><span class="s2">&quot;rds:DescribeDBClusters&quot;</span><span class="p">,</span>
-<span class="w">                   </span><span class="s2">&quot;rds:DescribeGlobalClusters&quot;</span><span class="p">]</span>
+<span class="w">        </span><span class="na">resources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"aws_db_instance.my_project_db.arn"</span><span class="p">]</span>
+<span class="w">        </span><span class="na">actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"rds:DescribeDBInstances"</span><span class="p">,</span>
+<span class="w">                   </span><span class="s2">"rds:DescribeDBClusters"</span><span class="p">,</span>
+<span class="w">                   </span><span class="s2">"rds:DescribeGlobalClusters"</span><span class="p">]</span>
 <span class="w">    </span><span class="p">}</span><span class="w">             </span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>You probably noticed this is the first time we're using a <code>data</code> block instead of a <code>resource</code> block. The key difference here is that resource blocks are used to create/manage infrastructure resources, while data blocks are used to fetch and reference information from external services.</p>
 <p>Now we create the user:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Provides an IAM user</span>
-<span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_iam_user&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_user&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my-project-user&quot;</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_iam_user"</span><span class="w"> </span><span class="nv">"my_project_user"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-user"</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>And attach the policy to the user:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Provides an IAM policy attached to a user</span>
-<span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_iam_user_policy&quot;</span><span class="w"> </span><span class="nv">&quot;my_project_user_policy&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my-project-policy&quot;</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_iam_user_policy"</span><span class="w"> </span><span class="nv">"my_project_user_policy"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-policy"</span>
 <span class="w">    </span><span class="na">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_iam_user.my_project_user.name</span>
 <span class="w">    </span><span class="na">policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">data.aws_iam_policy_document.my_project_user_policy.json</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <h2>Wrapping up</h2>
 <p>That's it, now we're really done with our little project. After going through all those steps, here's what we've got:</p>
 <ul>
@@ -490,46 +466,43 @@ resource &quot;aws_iam_role_policy&quot; &quot;my_project_role_policy&quot; {
 <li>An IAM user with proper permissions to interact with the EC2 and RDS instances</li>
 </ul>
 <div class="footnote">
-<hr>
+<hr/>
 <ol>
 <li id="fn:1">
-<p>RDS – Amazon Relational Database Service is a managed database service provided by AWS that simplifies the process of setting up, operating, and scaling a relational database in the cloud.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p>RDS – Amazon Relational Database Service is a managed database service provided by AWS that simplifies the process of setting up, operating, and scaling a relational database in the cloud. <a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">↩</a></p>
 </li>
 <li id="fn:2">
-<p>EC2 – Elastic Compute Cloud is a virtual server provided by AWS that allows you to run applications and services in the cloud.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<p>EC2 – Elastic Compute Cloud is a virtual server provided by AWS that allows you to run applications and services in the cloud. <a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">↩</a></p>
 </li>
 <li id="fn:3">
-<p>VPC – Virtual Private Cloud is a virtual network infrastructure that allows you to create a logically isolated network environment. It is essentially a virtual data center in the cloud&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<p>VPC – Virtual Private Cloud is a virtual network infrastructure that allows you to create a logically isolated network environment. It is essentially a virtual data center in the cloud <a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">↩</a></p>
 </li>
 <li id="fn:4">
-<p>A Security Group is a virtual firewall that controls the inbound and outbound traffic for one or more instances. Every instance within a VPC in AWS must be associated with at least one security group.&#160;<a class="footnote-backref" href="#fnref:4" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+<p>A Security Group is a virtual firewall that controls the inbound and outbound traffic for one or more instances. Every instance within a VPC in AWS must be associated with at least one security group. <a class="footnote-backref" href="#fnref:4" title="Jump back to footnote 4 in the text">↩</a></p>
 </li>
 <li id="fn:5">
-<p>IAM - Identity and Access Management is a service that allows you to manage access to AWS resources securely. IAM enables you to create and manage AWS users and groups and control their level of access to AWS resources.&#160;<a class="footnote-backref" href="#fnref:5" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+<p>IAM - Identity and Access Management is a service that allows you to manage access to AWS resources securely. IAM enables you to create and manage AWS users and groups and control their level of access to AWS resources. <a class="footnote-backref" href="#fnref:5" title="Jump back to footnote 5 in the text">↩</a></p>
 </li>
 </ol>
 </div>
-    </div>
-  </article>
-    </div>
-  </div>
-
-  <footer class="footer">
-    <div class="container">
+</div>
+</article>
+</div>
+</div>
+<footer class="footer">
+<div class="container">
 <div class="row">
-  <ul class="col-sm-6 list-inline">
-      <li class="list-inline-item"><a href="/authors.html">Authors</a></li>
-    <li class="list-inline-item"><a href="/archives.html">Archives</a></li>
-    <li class="list-inline-item"><a href="/categories.html">Categories</a></li>
-      <li class="list-inline-item"><a href="/tags.html">Tags</a></li>
-  </ul>
-  <p class="col-sm-6 text-sm-right text-muted">
+<ul class="col-sm-6 list-inline">
+<li class="list-inline-item"><a href="/authors.html">Authors</a></li>
+<li class="list-inline-item"><a href="/archives.html">Archives</a></li>
+<li class="list-inline-item"><a href="/categories.html">Categories</a></li>
+<li class="list-inline-item"><a href="/tags.html">Tags</a></li>
+</ul>
+<p class="col-sm-6 text-sm-right text-muted">
     Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
-    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
-  </p>
-</div>    </div>
-  </footer>
-
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">✨</a>
+</p>
+</div> </div>
+</footer>
 </body>
-
 </html>

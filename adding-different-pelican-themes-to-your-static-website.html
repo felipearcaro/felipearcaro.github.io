@@ -1,60 +1,51 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
-
 <head>
-  <!-- Required meta tags -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-  <title>  Adding different Pelican themes to your static website | Felipe Arcaro
+<!-- Required meta tags -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+<title>  Adding different Pelican themes to your static website | Felipe Arcaro
 </title>
-  <link rel="canonical" href="/adding-different-pelican-themes-to-your-static-website.html">
-
-
-  <link rel="stylesheet" href="/theme/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/theme/css/fontawesome.min.css">
-  <link rel="stylesheet" href="/theme/css/pygments/default.min.css">
-  <link rel="stylesheet" href="/theme/css/theme.css">
-
-  
-  <meta name="description" content="Community-managed repositories for themes? Sounds fun.">
-
-
+<link href="/adding-different-pelican-themes-to-your-static-website.html" rel="canonical"/>
+<link href="/theme/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/theme/css/fontawesome.min.css" rel="stylesheet"/>
+<link href="/theme/css/pygments/default.min.css" rel="stylesheet"/>
+<link href="/theme/css/theme.css" rel="stylesheet"/>
+<meta content="Community-managed repositories for themes? Sounds fun." name="description"/>
 </head>
-
 <body>
-  <header class="header">
-    <div class="container">
+<header class="header">
+<div class="container">
 <div class="row">
-  <div class="col-sm-12">
-    <h1 class="title"><a href="/">Felipe Arcaro</a></h1>
-  </div>
-</div>    </div>
-  </header>
-
-  <div class="main">
-    <div class="container">
-      <h1>  Adding different Pelican themes to your static website
+<div class="col-sm-12">
+<h1 class="title"><a href="/">Felipe Arcaro</a></h1>
+</div>
+</div> </div>
+</header>
+<div class="main">
+<div class="container">
+<h1>  Adding different Pelican themes to your static website
 </h1>
-      <hr>
-  <article class="article">
-    <header>
-      <ul class="list-inline">
-        <li class="list-inline-item text-muted" title="2023-08-29T15:01:00+02:00">
-          <i class="fas fa-clock"></i>
+<hr/>
+<article class="article">
+<header>
+<ul class="list-inline">
+<li class="list-inline-item text-muted" title="2023-08-29T15:01:00+02:00">
+<i class="fas fa-clock"></i>
           Tue 29 August 2023
         </li>
-        <li class="list-inline-item">
-          <i class="fas fa-folder-open"></i>
-          <a href="/category/writing.html">Writing</a>
-        </li>
-          <li class="list-inline-item">
-            <i class="fas fa-tag"></i>
-              <a href="/tag/python.html">#python</a>,               <a href="/tag/static-website.html">#static-website</a>,               <a href="/tag/pelican.html">#pelican</a>          </li>
-      </ul>
-    </header>
-    <div class="content">
-      <p>This post is part of a series:</p>
+<li class="list-inline-item">
+<i class="fas fa-folder-open"></i>
+<a href="/category/writing.html">Writing</a>
+</li>
+<li class="list-inline-item">
+<i class="fas fa-tag"></i>
+<a href="/tag/python.html">#python</a>,               <a href="/tag/static-website.html">#static-website</a>,               <a href="/tag/pelican.html">#pelican</a> </li>
+</ul>
+</header>
+<div class="content">
+<p>This post is part of a series:</p>
 <ol>
 <li><a href="/getting-started-with-pelican-static-site-generator-written-in-python.html">Getting started with Pelican – Static site generator written in Python</a></li>
 <li><strong>[ <a href="/adding-different-pelican-themes-to-your-static-website.html">Adding different Pelican themes to your static website</a> ]</strong></li>
@@ -65,9 +56,11 @@
 <li>Clone one of these <a href="https://github.com/getpelican/pelican-themes">community-managed theme repos</a></li>
 <li>Run the following command on the terminal <code>pelican content -t /path/to/theme -r -l</code> </li>
 </ul>
-<hr>
+<hr/>
 <h1>What is a Pelican theme?</h1>
-<p>When you create your first static website using Pelican, you'll notice the design looks like it hasn't been updated since the 90s, and that's exactly where Pelican themes come into play. There is a community-managed repository of <a href="https://github.com/getpelican/pelican-themes">Pelican Themes</a> for people to share and use.</p>
+<p>When you create your first static website using Pelican, you'll notice the design looks like it hasn't been updated since the 90s:</p>
+<p><img alt="pelican-website" class="image-process-large-photo" sizes="(min-width: 1200px) 800px, (min-width: 992px) 650px, (min-width: 768px) 718px, 100vw" src="/images/derivatives/large-photo/800w/pelican-website.png" srcset="/images/derivatives/large-photo/600w/pelican-website.png 600w, /images/derivatives/large-photo/800w/pelican-website.png 800w, /images/derivatives/large-photo/1600w/pelican-website.png 1600w"/></p>
+<p>That's exactly where Pelican themes come into play. There is a community-managed repository of <a href="https://github.com/getpelican/pelican-themes">Pelican Themes</a> for people to share and use.</p>
 <h1>Can I create my own Pelican theme?</h1>
 <p>You can obviously <a href="https://docs.getpelican.com/en/latest/themes.html#creating-themes">create your own Pelican theme</a> but if you want to get up and running fast with a not-so-bad-looking website, the easiest path is to pick <a href="https://pelicanthemes.com/">a Pelican theme that already exists</a>. </p>
 <h1>How to use a Pelican theme</h1>
@@ -79,39 +72,35 @@
 <p>Reference it with the <code>-t</code> flag when running your <code>pelican</code> command</p>
 <div class="highlight"><pre><span></span><code>pelican content -t path/to/the/theme/pelican-alchemy/alchemy -r -l
 </code></pre></div>
-
 <p>Reference it in the <code>pelicanconf.py</code> file adding the following line to it</p>
-<div class="highlight"><pre><span></span><code>THEME = &#39;path/to/the/theme/pelican-alchemy/alchemy&#39;
+<div class="highlight"><pre><span></span><code>THEME = 'path/to/the/theme/pelican-alchemy/alchemy'
 </code></pre></div>
-
 <p>And then running the following command:</p>
 <div class="highlight"><pre><span></span><code>pelican content -s pelicanconf.py path/to/the/theme/pelican-alchemy/alchemy -r -l
 </code></pre></div>
-
 <blockquote>
 <p>Make sure you're specifying the right path – in this example, we need to specify <code>pelican-alchemy/alchemy</code> and not just <code>pelican-alchemy</code>)</p>
 </blockquote>
-    </div>
-  </article>
-    </div>
-  </div>
-
-  <footer class="footer">
-    <div class="container">
+<p>Here's how your static website will look like with the new Alchemy theme:</p>
+<p><img alt="pelican-website-alchemy-theme" class="image-process-large-photo" sizes="(min-width: 1200px) 800px, (min-width: 992px) 650px, (min-width: 768px) 718px, 100vw" src="/images/derivatives/large-photo/800w/pelican-website-alchemy-theme.png" srcset="/images/derivatives/large-photo/600w/pelican-website-alchemy-theme.png 600w, /images/derivatives/large-photo/800w/pelican-website-alchemy-theme.png 800w, /images/derivatives/large-photo/1600w/pelican-website-alchemy-theme.png 1600w"/></p>
+</div>
+</article>
+</div>
+</div>
+<footer class="footer">
+<div class="container">
 <div class="row">
-  <ul class="col-sm-6 list-inline">
-      <li class="list-inline-item"><a href="/authors.html">Authors</a></li>
-    <li class="list-inline-item"><a href="/archives.html">Archives</a></li>
-    <li class="list-inline-item"><a href="/categories.html">Categories</a></li>
-      <li class="list-inline-item"><a href="/tags.html">Tags</a></li>
-  </ul>
-  <p class="col-sm-6 text-sm-right text-muted">
+<ul class="col-sm-6 list-inline">
+<li class="list-inline-item"><a href="/authors.html">Authors</a></li>
+<li class="list-inline-item"><a href="/archives.html">Archives</a></li>
+<li class="list-inline-item"><a href="/categories.html">Categories</a></li>
+<li class="list-inline-item"><a href="/tags.html">Tags</a></li>
+</ul>
+<p class="col-sm-6 text-sm-right text-muted">
     Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
-    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
-  </p>
-</div>    </div>
-  </footer>
-
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">✨</a>
+</p>
+</div> </div>
+</footer>
 </body>
-
 </html>

@@ -1,60 +1,51 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
-
 <head>
-  <!-- Required meta tags -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-  <title>  Getting started with Pelican – Static site generator written in Python | Felipe Arcaro
+<!-- Required meta tags -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+<title>  Getting started with Pelican – Static site generator written in Python | Felipe Arcaro
 </title>
-  <link rel="canonical" href="/getting-started-with-pelican-static-site-generator-written-in-python.html">
-
-
-  <link rel="stylesheet" href="/theme/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/theme/css/fontawesome.min.css">
-  <link rel="stylesheet" href="/theme/css/pygments/default.min.css">
-  <link rel="stylesheet" href="/theme/css/theme.css">
-
-  
-  <meta name="description" content="Pelican's journey to making tech writing cool again (at least for me).">
-
-
+<link href="/getting-started-with-pelican-static-site-generator-written-in-python.html" rel="canonical"/>
+<link href="/theme/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/theme/css/fontawesome.min.css" rel="stylesheet"/>
+<link href="/theme/css/pygments/default.min.css" rel="stylesheet"/>
+<link href="/theme/css/theme.css" rel="stylesheet"/>
+<meta content="Pelican's journey to making tech writing cool again (at least for me)." name="description"/>
 </head>
-
 <body>
-  <header class="header">
-    <div class="container">
+<header class="header">
+<div class="container">
 <div class="row">
-  <div class="col-sm-12">
-    <h1 class="title"><a href="/">Felipe Arcaro</a></h1>
-  </div>
-</div>    </div>
-  </header>
-
-  <div class="main">
-    <div class="container">
-      <h1>  Getting started with Pelican – Static site generator written in Python
+<div class="col-sm-12">
+<h1 class="title"><a href="/">Felipe Arcaro</a></h1>
+</div>
+</div> </div>
+</header>
+<div class="main">
+<div class="container">
+<h1>  Getting started with Pelican – Static site generator written in Python
 </h1>
-      <hr>
-  <article class="article">
-    <header>
-      <ul class="list-inline">
-        <li class="list-inline-item text-muted" title="2023-08-14T14:29:00+02:00">
-          <i class="fas fa-clock"></i>
+<hr/>
+<article class="article">
+<header>
+<ul class="list-inline">
+<li class="list-inline-item text-muted" title="2023-08-14T14:29:00+02:00">
+<i class="fas fa-clock"></i>
           Mon 14 August 2023
         </li>
-        <li class="list-inline-item">
-          <i class="fas fa-folder-open"></i>
-          <a href="/category/writing.html">Writing</a>
-        </li>
-          <li class="list-inline-item">
-            <i class="fas fa-tag"></i>
-              <a href="/tag/python.html">#python</a>,               <a href="/tag/static-website.html">#static-website</a>,               <a href="/tag/pelican.html">#pelican</a>          </li>
-      </ul>
-    </header>
-    <div class="content">
-      <p>This post is part of a series:</p>
+<li class="list-inline-item">
+<i class="fas fa-folder-open"></i>
+<a href="/category/writing.html">Writing</a>
+</li>
+<li class="list-inline-item">
+<i class="fas fa-tag"></i>
+<a href="/tag/python.html">#python</a>,               <a href="/tag/static-website.html">#static-website</a>,               <a href="/tag/pelican.html">#pelican</a> </li>
+</ul>
+</header>
+<div class="content">
+<p>This post is part of a series:</p>
 <ol>
 <li><strong>[ <a href="/getting-started-with-pelican-static-site-generator-written-in-python.html">Getting started with Pelican – Static site generator written in Python</a> ]</strong></li>
 <li><a href="/adding-different-pelican-themes-to-your-static-website.html">Adding different Pelican themes to your static website</a> </li>
@@ -73,11 +64,10 @@
 
 <span class="n">Cool</span><span class="w"> </span><span class="n">content</span><span class="w"> </span><span class="n">goes</span><span class="w"> </span><span class="n">here</span><span class="o">.</span>
 </code></pre></div>
-
 <ol>
 <li>Run <code>pelican -r -l</code>, open a browser, and navigate to <a href="http://localhost:8000/">http://localhost:8000/</a> to see the website running locally</li>
 </ol>
-<hr>
+<hr/>
 <h1>What is Pelican?</h1>
 <p>Pelican is a static site generator written in Python. </p>
 <p>Here are some of the things I really like about it: </p>
@@ -113,9 +103,8 @@ python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </s
 ./env-pelican/Scripts/activate
 
 <span class="c1"># Install Pelican package</span>
-python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pelican[markdown]&quot;</span>
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"pelican[markdown]"</span>
 </code></pre></div>
-
 <ul>
 <li>Run  <code>pelican-quickstart</code> and answer the questions that will pop up</li>
 <li>Create an article named <code>my_article.md</code> with the following content (you can learn more about Pelican's supported metadata <a href="https://docs.getpelican.com/en/latest/content.html">here</a>)</li>
@@ -126,7 +115,6 @@ python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </sp
 
 <span class="n">Cool</span><span class="w"> </span><span class="n">content</span><span class="w"> </span><span class="n">goes</span><span class="w"> </span><span class="n">here</span><span class="o">.</span>
 </code></pre></div>
-
 <ul>
 <li>Run <code>pelican -r -l</code>, open a browser, and navigate to <a href="http://localhost:8000/">http://localhost:8000/</a> to see the website running locally<ul>
 <li><code>-r</code> flag relaunches pelican each time a modification occurs on the content files</li>
@@ -134,27 +122,26 @@ python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </sp
 </ul>
 </li>
 </ul>
-    </div>
-  </article>
-    </div>
-  </div>
-
-  <footer class="footer">
-    <div class="container">
+<p>Here's how your static website will look like:</p>
+<p><img alt="pelican-website" class="image-process-large-photo" sizes="(min-width: 1200px) 800px, (min-width: 992px) 650px, (min-width: 768px) 718px, 100vw" src="/images/derivatives/large-photo/800w/pelican-website.png" srcset="/images/derivatives/large-photo/600w/pelican-website.png 600w, /images/derivatives/large-photo/800w/pelican-website.png 800w, /images/derivatives/large-photo/1600w/pelican-website.png 1600w"/></p>
+</div>
+</article>
+</div>
+</div>
+<footer class="footer">
+<div class="container">
 <div class="row">
-  <ul class="col-sm-6 list-inline">
-      <li class="list-inline-item"><a href="/authors.html">Authors</a></li>
-    <li class="list-inline-item"><a href="/archives.html">Archives</a></li>
-    <li class="list-inline-item"><a href="/categories.html">Categories</a></li>
-      <li class="list-inline-item"><a href="/tags.html">Tags</a></li>
-  </ul>
-  <p class="col-sm-6 text-sm-right text-muted">
+<ul class="col-sm-6 list-inline">
+<li class="list-inline-item"><a href="/authors.html">Authors</a></li>
+<li class="list-inline-item"><a href="/archives.html">Archives</a></li>
+<li class="list-inline-item"><a href="/categories.html">Categories</a></li>
+<li class="list-inline-item"><a href="/tags.html">Tags</a></li>
+</ul>
+<p class="col-sm-6 text-sm-right text-muted">
     Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
-    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
-  </p>
-</div>    </div>
-  </footer>
-
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">✨</a>
+</p>
+</div> </div>
+</footer>
 </body>
-
 </html>
