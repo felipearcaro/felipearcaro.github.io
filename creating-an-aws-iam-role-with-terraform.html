@@ -124,54 +124,54 @@
 <li>Update the EC2 code to use that role</li>
 </ul>
 <p>Let's start creating an IAM role for our EC2 service:</p>
-<div class="highlight"><pre><span></span><code>#<span class="w"> </span><span class="nv">IAM</span><span class="w"> </span><span class="nv">role</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">EC2</span><span class="w"> </span><span class="nv">instance</span>
-<span class="nv">resource</span><span class="w"> </span><span class="s2">"aws_iam_role"</span><span class="w"> </span><span class="s2">"my_project_role"</span><span class="w"> </span>{
-<span class="w">  </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-role"</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># IAM role for EC2 instance</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_iam_role"</span><span class="w"> </span><span class="nv">"my_project_role"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-role"</span>
 
-<span class="w">  </span><span class="nv">assume_role_policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">jsonencode</span><span class="ss">(</span>{
-<span class="w">    </span><span class="nv">Version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"2012-10-17"</span>
-<span class="w">    </span><span class="nv">Statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>[
-<span class="w">      </span>{
-<span class="w">        </span><span class="nv">Action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"sts:AssumeRole"</span>
-<span class="w">        </span><span class="nv">Effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Allow"</span>
-<span class="w">        </span><span class="nv">Sid</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s2">""</span>
-<span class="w">        </span><span class="nv">Principal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>{
-<span class="w">          </span><span class="nv">Service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ec2.amazonaws.com"</span>
-<span class="w">        </span>}
-<span class="w">      </span>}
-<span class="w">    </span>]
-<span class="w">  </span>}<span class="ss">)</span>
-}
+<span class="w">  </span><span class="na">assume_role_policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">jsonencode</span><span class="p">({</span>
+<span class="w">    </span><span class="na">Version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"2012-10-17"</span>
+<span class="w">    </span><span class="na">Statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="na">Action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"sts:AssumeRole"</span>
+<span class="w">        </span><span class="na">Effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Allow"</span>
+<span class="w">        </span><span class="na">Sid</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s2">""</span>
+<span class="w">        </span><span class="nb">Principal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="na">Service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ec2.amazonaws.com"</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">})</span>
+<span class="p">}</span>
 </code></pre></div>
 <p>And now we create a policy with all permissions to our RDS instance and reference the role we just created.</p>
-<div class="highlight"><pre><span></span><code># IAM policy to be attached to the EC2 role
-resource "aws_iam_role_policy" "my_project_role_policy" {
-  name = "my-project-role-policy"
-  role = aws_iam_role.my_project_role.id
+<div class="highlight"><pre><span></span><code><span class="c1"># IAM policy to be attached to the EC2 role</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_iam_role_policy"</span><span class="w"> </span><span class="nv">"my_project_role_policy"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-role-policy"</span>
+<span class="w">  </span><span class="na">role</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_iam_role.my_project_role.id</span>
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = [
-          "rds:*",
-        ]
-        Effect   = "Allow"
-        Resource = aws_db_instance.my_project_db.arn
-      },
-    ]
-  })
-}
+<span class="w">  </span><span class="na">policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">jsonencode</span><span class="p">({</span>
+<span class="w">    </span><span class="na">Version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"2012-10-17"</span>
+<span class="w">    </span><span class="na">Statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="na">Action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="s2">"rds:*"</span><span class="p">,</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">        </span><span class="na">Effect</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s2">"Allow"</span>
+<span class="w">        </span><span class="na">Resource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_db_instance.my_project_db.arn</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">})</span>
+<span class="p">}</span>
 </code></pre></div>
 <p>Now we have to update our EC2 instance code to make sure it uses the role and permissions we just defined. For that, we just add <code>iam_instance_profile = aws_iam_role.my_project_role.arn</code> to it:</p>
-<div class="highlight"><pre><span></span><code><span class="nx">resource</span><span class="w"> </span><span class="s">"aws_instance"</span><span class="w"> </span><span class="s">"my_project_ec2"</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nx">instance_type</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"t2.micro"</span>
-<span class="w">  </span><span class="nx">ami</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"ami-06e46074ae430fba6"</span>
-<span class="w">  </span><span class="nx">tags</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">Name</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"my-python-project"</span>
+<div class="highlight"><pre><span></span><code><span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_instance"</span><span class="w"> </span><span class="nv">"my_project_ec2"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">instance_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"t2.micro"</span>
+<span class="w">  </span><span class="na">ami</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ami-06e46074ae430fba6"</span>
+<span class="w">  </span><span class="nb">tags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">Name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-python-project"</span>
 <span class="w">  </span><span class="p">}</span>
 
-<span class="w">  </span><span class="nx">iam_instance_profile</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">aws_iam_role</span><span class="p">.</span><span class="nx">my_project_role</span><span class="p">.</span><span class="nx">arn</span>
+<span class="w">  </span><span class="na">iam_instance_profile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_iam_role.my_project_role.arn</span>
 <span class="p">}</span>
 </code></pre></div>
 </div>
