@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+<title>  Creating an AWS IAM role with Terraform | Felipe Arcaro
+</title>
+<link href="/creating-an-aws-iam-role-with-terraform.html" rel="canonical"/>
+<link href="/theme/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/theme/css/fontawesome.min.css" rel="stylesheet"/>
+<link href="/theme/css/pygments/default.min.css" rel="stylesheet"/>
+<link href="/theme/css/theme.css" rel="stylesheet"/>
+<meta content="Even machines need permission to do stuff" name="description"/>
+</head>
+<body>
+<header class="header">
+<div class="container">
+<div class="row">
+<div class="col-sm-12">
+<h1 class="title"><a href="/">Felipe Arcaro</a></h1>
+</div>
+</div> </div>
+</header>
+<div class="main">
+<div class="container">
+<h1>  Creating an AWS IAM role with Terraform
+</h1>
+<hr/>
+<article class="article">
+<header>
+<ul class="list-inline">
+<li class="list-inline-item text-muted" title="2023-10-02T15:34:00+02:00">
+<i class="fas fa-clock"></i>
+          Mon 02 October 2023
+        </li>
+<li class="list-inline-item">
+<i class="fas fa-folder-open"></i>
+<a href="/category/devops.html">DevOps</a>
+</li>
+<li class="list-inline-item">
+<i class="fas fa-tag"></i>
+<a href="/tag/terraform.html">#terraform</a>,               <a href="/tag/dataops.html">#dataops</a>,               <a href="/tag/devops.html">#devops</a>,               <a href="/tag/cloud.html">#cloud</a> </li>
+</ul>
+</header>
+<div class="content">
+<p>This article is part of a series.</p>
+<h4>Understanding the basics of Terraform</h4>
+<ol>
+<li><a href="/introduction-to-terraform.html">Introduction to Terraform</a></li>
+<li><a href="/creating-an-aws-rds-instance-with-terraform.html">Creating an AWS RDS instance with Terraform</a></li>
+<li><a href="/creating-an-aws-ec2-instance-with-terraform.html">Creating an AWS EC2 instance with Terraform</a></li>
+<li><strong>[ <a href="/creating-an-aws-iam-role-with-terraform.html">Creating an AWS IAM role with Terraform</a> ]</strong></li>
+<li><a href="/creating-an-aws-iam-user-with-terraform.html">Creating an AWS IAM user with Terraform</a></li>
+</ol>
+<hr/>
+<h2>TL;DR</h2>
+<p>Here's the Terraform code to create an IAM role so an EC2 instance has proper access to an RDS instance:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># IAM role for EC2 instance</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_iam_role"</span><span class="w"> </span><span class="nv">"my_project_role"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-role"</span>
+
+<span class="w">  </span><span class="na">assume_role_policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">jsonencode</span><span class="p">({</span>
+<span class="w">    </span><span class="na">Version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"2012-10-17"</span>
+<span class="w">    </span><span class="na">Statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="na">Action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"sts:AssumeRole"</span>
+<span class="w">        </span><span class="na">Effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Allow"</span>
+<span class="w">        </span><span class="na">Sid</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s2">""</span>
+<span class="w">        </span><span class="nb">Principal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="na">Service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ec2.amazonaws.com"</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">})</span>
+<span class="p">}</span>
+
+<span class="c1"># IAM policy to be attached to the EC2 role</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_iam_role_policy"</span><span class="w"> </span><span class="nv">"my_project_role_policy"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-role-policy"</span>
+<span class="w">  </span><span class="na">role</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_iam_role.my_project_role.id</span>
+
+<span class="w">  </span><span class="na">policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">jsonencode</span><span class="p">({</span>
+<span class="w">    </span><span class="na">Version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"2012-10-17"</span>
+<span class="w">    </span><span class="na">Statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="na">Action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="s2">"rds:*"</span><span class="p">,</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">        </span><span class="na">Effect</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s2">"Allow"</span>
+<span class="w">        </span><span class="na">Resource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_db_instance.my_project_db.arn</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">})</span>
+<span class="p">}</span>
+
+<span class="c1"># Update EC2 resource created earlier</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_instance"</span><span class="w"> </span><span class="nv">"my_project_ec2"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">instance_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"t2.micro"</span>
+<span class="w">  </span><span class="na">ami</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ami-06e46074ae430fba6"</span>
+<span class="w">  </span><span class="nb">tags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">Name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-python-project"</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="na">iam_instance_profile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_iam_role.my_project_role.arn</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<p>Nice, we're done with the goals we defined at the beginning of this article but we want more – actually, we need more. Now it's time to create an IAM user with specific (and restricted) access to use/manage the infrastructure we just created and an IAM role so the EC2 instance can access the RDS instance.</p>
+<blockquote>
+<p>Identity and Access Management (IAM) is a service that allows you to manage access to AWS resources securely. IAM enables you to create and manage AWS users and groups and control their level of access to AWS resources.</p>
+</blockquote>
+<p>As per IAM standards:</p>
+<ul>
+<li>We create groups with permissions and then add users to these groups </li>
+<li>We create roles and assign them to AWS services so they communicate with each other </li>
+</ul>
+<p>For this example, we won't create any IAM groups but it is important to remember that we cannot assign a role to a user.</p>
+<h2>Creating an IAM role</h2>
+<p>Here are the things we'll need to add to our Terraform code:</p>
+<ul>
+<li>A policy defining permissions</li>
+<li>An IAM role</li>
+<li>Update the EC2 code to use that role</li>
+</ul>
+<p>Let's start creating an IAM role for our EC2 service:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># IAM role for EC2 instance</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_iam_role"</span><span class="w"> </span><span class="nv">"my_project_role"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-role"</span>
+
+<span class="w">  </span><span class="na">assume_role_policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">jsonencode</span><span class="p">({</span>
+<span class="w">    </span><span class="na">Version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"2012-10-17"</span>
+<span class="w">    </span><span class="na">Statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="na">Action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"sts:AssumeRole"</span>
+<span class="w">        </span><span class="na">Effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Allow"</span>
+<span class="w">        </span><span class="na">Sid</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s2">""</span>
+<span class="w">        </span><span class="nb">Principal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="na">Service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ec2.amazonaws.com"</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>And now we create a policy with all permissions to our RDS instance and reference the role we just created.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># IAM policy to be attached to the EC2 role</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_iam_role_policy"</span><span class="w"> </span><span class="nv">"my_project_role_policy"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-role-policy"</span>
+<span class="w">  </span><span class="na">role</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_iam_role.my_project_role.id</span>
+
+<span class="w">  </span><span class="na">policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">jsonencode</span><span class="p">({</span>
+<span class="w">    </span><span class="na">Version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"2012-10-17"</span>
+<span class="w">    </span><span class="na">Statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="na">Action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="s2">"rds:*"</span><span class="p">,</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">        </span><span class="na">Effect</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s2">"Allow"</span>
+<span class="w">        </span><span class="na">Resource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_db_instance.my_project_db.arn</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Now we have to update our EC2 instance code to make sure it uses the role and permissions we just defined. For that, we just add <code>iam_instance_profile = aws_iam_role.my_project_role.arn</code> to it:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_instance"</span><span class="w"> </span><span class="nv">"my_project_ec2"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">instance_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"t2.micro"</span>
+<span class="w">  </span><span class="na">ami</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ami-06e46074ae430fba6"</span>
+<span class="w">  </span><span class="nb">tags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">Name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-python-project"</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="na">iam_instance_profile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_iam_role.my_project_role.arn</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+</article>
+</div>
+</div>
+<footer class="footer">
+<div class="container">
+<div class="row">
+<ul class="col-sm-6 list-inline">
+<li class="list-inline-item"><a href="/authors.html">Authors</a></li>
+<li class="list-inline-item"><a href="/archives.html">Archives</a></li>
+<li class="list-inline-item"><a href="/categories.html">Categories</a></li>
+<li class="list-inline-item"><a href="/tags.html">Tags</a></li>
+</ul>
+<p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">✨</a>
+</p>
+</div> </div>
+</footer>
+</body>
+</html>

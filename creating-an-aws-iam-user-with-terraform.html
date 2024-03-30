@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+<title>  Creating an AWS IAM user with Terraform | Felipe Arcaro
+</title>
+<link href="/creating-an-aws-iam-user-with-terraform.html" rel="canonical"/>
+<link href="/theme/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/theme/css/fontawesome.min.css" rel="stylesheet"/>
+<link href="/theme/css/pygments/default.min.css" rel="stylesheet"/>
+<link href="/theme/css/theme.css" rel="stylesheet"/>
+<meta content="Just.. let.. me... in" name="description"/>
+</head>
+<body>
+<header class="header">
+<div class="container">
+<div class="row">
+<div class="col-sm-12">
+<h1 class="title"><a href="/">Felipe Arcaro</a></h1>
+</div>
+</div> </div>
+</header>
+<div class="main">
+<div class="container">
+<h1>  Creating an AWS IAM user with Terraform
+</h1>
+<hr/>
+<article class="article">
+<header>
+<ul class="list-inline">
+<li class="list-inline-item text-muted" title="2023-10-10T22:34:00+02:00">
+<i class="fas fa-clock"></i>
+          Tue 10 October 2023
+        </li>
+<li class="list-inline-item">
+<i class="fas fa-folder-open"></i>
+<a href="/category/devops.html">DevOps</a>
+</li>
+<li class="list-inline-item">
+<i class="fas fa-tag"></i>
+<a href="/tag/terraform.html">#terraform</a>,               <a href="/tag/dataops.html">#dataops</a>,               <a href="/tag/devops.html">#devops</a>,               <a href="/tag/cloud.html">#cloud</a> </li>
+</ul>
+</header>
+<div class="content">
+<p>This article is part of a series.</p>
+<h4>Understanding the basics of Terraform</h4>
+<ol>
+<li><a href="/introduction-to-terraform.html">Introduction to Terraform</a></li>
+<li><a href="/creating-an-aws-rds-instance-with-terraform.html">Creating an AWS RDS instance with Terraform</a></li>
+<li>[ <a href="/creating-an-aws-ec2-instance-with-terraform.html">Creating an AWS EC2 instance with Terraform</a></li>
+<li><a href="/creating-an-aws-iam-role-with-terraform.html">Creating an AWS IAM role with Terraform</a></li>
+<li><strong>[ <a href="/creating-an-aws-iam-user-with-terraform.html">Creating an AWS IAM user with Terraform</a> ]</strong></li>
+</ol>
+<hr/>
+<h2>TL;DR</h2>
+<p>Here's the Terraform code to create an IAM user with access to EC2 and RDS instances:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">data</span><span class="w"> </span><span class="nc">"aws_iam_policy_document"</span><span class="w"> </span><span class="nv">"my_project_policy"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nb">statement</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="na">resources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">aws_instance.my_project_ec2.arn</span><span class="p">]</span>
+<span class="w">        </span><span class="na">actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"ec2:*"</span><span class="p">]</span>
+<span class="w">        </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Allow"</span><span class="c1"> # Default is Allow</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nb">statement</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="na">resources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"aws_db_instance.my_project_db.arn"</span><span class="p">]</span>
+<span class="w">        </span><span class="na">actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"rds:DescribeDBInstances"</span><span class="p">,</span>
+<span class="w">                   </span><span class="s2">"rds:DescribeDBClusters"</span><span class="p">,</span>
+<span class="w">                   </span><span class="s2">"rds:DescribeGlobalClusters"</span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span><span class="w">             </span>
+<span class="p">}</span>
+
+<span class="c1"># Provides an IAM user</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_iam_user"</span><span class="w"> </span><span class="nv">"my_project_user"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-user"</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<p>Now that we already created an IAM role so the EC2 instance can access the RDS instance, it's time to create an IAM user with specific (and restricted) access to use/manage the infrastructure we just created.</p>
+<p>Here's a quick recap on IAM:
+- Identity and Access Management (IAM) is a service that allows you to manage access to AWS resources securely
+- IAM enables you to create and manage AWS users and groups and control their level of access to AWS resources
+- We create groups with permissions and then add users to these groups 
+- We create roles and assign them to AWS services so they communicate with each other </p>
+<h2>Creating an IAM user</h2>
+<p>Here are the things we'll need to add to our Terraform code:</p>
+<ul>
+<li>A policy defining permissions</li>
+<li>An IAM user</li>
+<li>Combine the two above</li>
+</ul>
+<p>Let's start creating the policy:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">data</span><span class="w"> </span><span class="nc">"aws_iam_policy_document"</span><span class="w"> </span><span class="nv">"my_project_policy"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nb">statement</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="na">resources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">aws_instance.my_project_ec2.arn</span><span class="p">]</span>
+<span class="w">        </span><span class="na">actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"ec2:*"</span><span class="p">]</span>
+<span class="w">        </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Allow"</span><span class="c1"> # Default is Allow</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nb">statement</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="na">resources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"aws_db_instance.my_project_db.arn"</span><span class="p">]</span>
+<span class="w">        </span><span class="na">actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"rds:DescribeDBInstances"</span><span class="p">,</span>
+<span class="w">                   </span><span class="s2">"rds:DescribeDBClusters"</span><span class="p">,</span>
+<span class="w">                   </span><span class="s2">"rds:DescribeGlobalClusters"</span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span><span class="w">             </span>
+<span class="p">}</span>
+
+<span class="c1"># Provides an IAM user</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_iam_user"</span><span class="w"> </span><span class="nv">"my_project_user"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-user"</span>
+<span class="p">}</span>
+
+<span class="c1"># Provides an IAM policy attached to a user</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_iam_user_policy"</span><span class="w"> </span><span class="nv">"my_project_user_policy"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-policy"</span>
+<span class="w">    </span><span class="na">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_iam_user.my_project_user.name</span>
+<span class="w">    </span><span class="na">policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">data.aws_iam_policy_document.my_project_user_policy.json</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>You probably noticed this is the first time we're using a <code>data</code> block instead of a <code>resource</code> block. The key difference here is that resource blocks are used to create/manage infrastructure resources, while data blocks are used to fetch and reference information from external services.</p>
+<p>Now we create the user:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Provides an IAM user</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_iam_user"</span><span class="w"> </span><span class="nv">"my_project_user"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-user"</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>And attach the policy to the user:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Provides an IAM policy attached to a user</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_iam_user_policy"</span><span class="w"> </span><span class="nv">"my_project_user_policy"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-project-policy"</span>
+<span class="w">    </span><span class="na">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_iam_user.my_project_user.name</span>
+<span class="w">    </span><span class="na">policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">data.aws_iam_policy_document.my_project_user_policy.json</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2>Wrapping up</h2>
+<p>That's it, now we're really done with our little project. After going through all those steps, here's what we've got:</p>
+<ul>
+<li>An EC2 instance where we can deploy our Python project</li>
+<li>An RDS Postgres instance where that Python project can persist data</li>
+<li>An IAM role that allows the EC2 instance to connect to the RDS Postgres instance</li>
+<li>An IAM user with proper permissions to interact with the EC2 and RDS instances</li>
+</ul>
+</div>
+</article>
+</div>
+</div>
+<footer class="footer">
+<div class="container">
+<div class="row">
+<ul class="col-sm-6 list-inline">
+<li class="list-inline-item"><a href="/authors.html">Authors</a></li>
+<li class="list-inline-item"><a href="/archives.html">Archives</a></li>
+<li class="list-inline-item"><a href="/categories.html">Categories</a></li>
+<li class="list-inline-item"><a href="/tags.html">Tags</a></li>
+</ul>
+<p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">✨</a>
+</p>
+</div> </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+<title>  Dockerizing a Flask application | Felipe Arcaro
+</title>
+<link href="/dockerizing-a-flask-application.html" rel="canonical"/>
+<link href="/theme/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/theme/css/fontawesome.min.css" rel="stylesheet"/>
+<link href="/theme/css/pygments/default.min.css" rel="stylesheet"/>
+<link href="/theme/css/theme.css" rel="stylesheet"/>
+<meta content="One container (three actually) to rule them all" name="description"/>
+</head>
+<body>
+<header class="header">
+<div class="container">
+<div class="row">
+<div class="col-sm-12">
+<h1 class="title"><a href="/">Felipe Arcaro</a></h1>
+</div>
+</div> </div>
+</header>
+<div class="main">
+<div class="container">
+<h1>  Dockerizing a Flask application
+</h1>
+<hr/>
+<article class="article">
+<header>
+<ul class="list-inline">
+<li class="list-inline-item text-muted" title="2023-08-01T08:08:00+02:00">
+<i class="fas fa-clock"></i>
+          Tue 01 August 2023
+        </li>
+<li class="list-inline-item">
+<i class="fas fa-folder-open"></i>
+<a href="/category/webapp.html">WebApp</a>
+</li>
+<li class="list-inline-item">
+<i class="fas fa-tag"></i>
+<a href="/tag/docker.html">#docker</a>,               <a href="/tag/flask.html">#flask</a>,               <a href="/tag/python.html">#python</a> </li>
+</ul>
+</header>
+<div class="content">
+<h1>TL;DR</h1>
+<p>Here's the <code>docker-compose.yml</code> file to dockerize a Flask application, a Mongo database and a schedule service:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">'3.8'</span>
+
+<span class="nt">services</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">app</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_app_${ENV}</span>
+<span class="w">    </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">context</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.</span><span class="w"> </span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8001:8001</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mongo_db</span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_network</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"flask"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"run"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"--host"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"0.0.0.0"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"--port"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"8001"</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">env_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.env</span>
+
+<span class="w">  </span><span class="nt">schedule_service</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">schedule_service_${ENV}</span>
+<span class="w">    </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">context</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./scheduler</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./common:/app/common</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./db:/app/db</span><span class="w">  </span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_networknetwork</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"python"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"-u"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"scheduler.py"</span><span class="p p-Indicator">]</span><span class="w"> </span>
+<span class="w">    </span><span class="nt">env_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.env</span>
+
+<span class="w">  </span><span class="nt">mongo_db</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mongo_db_${ENV}</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mongo:4.4.18</span>
+<span class="w">    </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">27017:27017</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./DB-STORAGE/mongo-db-$ENV:/data/db</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./db/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh</span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_network</span>
+<span class="w">    </span><span class="nt">env_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.env</span>
+
+<span class="nt">networks</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">my_network</span><span class="p">:</span><span class="w">  </span>
+<span class="w">    </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge</span>
+</code></pre></div>
+<p>Run the following command from your project's root directory <code>docker-compose up --build -d</code> to fire it all up.</p>
+<hr/>
+<h2>What is Docker?</h2>
+<p>Docker is a tool that helps us package up our apps so they can run smoothly no matter where they're deployed – it's like putting our app in a virtual box that contains everything it needs to work - code, settings, and libraries. These boxes are called "containers," and they're lightweight and easy to move around.</p>
+<blockquote>
+<p>With Docker, there's no such a thing as "but it works on my machine..."</p>
+</blockquote>
+<h2>Getting started with Dockerfile and Docker Compose</h2>
+<p>To spin up a container, we can do it directly from the terminal or we can create a file called <code>Dockerfile</code>, which works like a recipe for our app's container. In the <code>Dockerfile</code>, we specify what our app needs to run, like the programming language and dependencies.</p>
+<p>If we want to spin up more containers at once, we can use Docker Compose. Docker Compose reads a configuration file – usually called <code>docker-compose.yml</code>, that describes all the containers our app needs to run and how they should interact.</p>
+<h2>Why should we dockerize an application?</h2>
+<p>Dockerizing an application offers several benefits:</p>
+<ul>
+<li>It enhances collaboration and streamlines development workflows – we can work in isolated environments without conflicts, speeding up development and making it easier to onboard new team members</li>
+<li>It makes our app more portable – we can easily move it between different environments without worrying about compatibility issues which simplifies deployment and ensures consistency across different platforms</li>
+<li>It improves scalability and resource management - we can easily start/stop containers instances to accommodate fluctuations in traffic</li>
+</ul>
+<h2>Dockerizing a Flask application</h2>
+<p>Let's say we've got a Flask application with four main components: </p>
+<ul>
+<li>network: custom Docker network</li>
+<li>app: our Flask application</li>
+<li>mongo_db: a Mongo database</li>
+<li>schedule: an email schedule service </li>
+</ul>
+<p>Let's break the Docker Compose code down to understand these components at parameter level.</p>
+<h3>network</h3>
+<div class="highlight"><pre><span></span><code><span class="n">networks</span><span class="o">:</span>
+<span class="w">  </span><span class="n">quot</span><span class="o">-</span><span class="n">network</span><span class="o">:</span><span class="w">  </span>
+<span class="w">    </span><span class="n">driver</span><span class="o">:</span><span class="w"> </span><span class="n">bridge</span>
+</code></pre></div>
+<ul>
+<li><code>networks</code> is used to define custom Docker networks in Docker Compose, it allows us to create separate networks for our services, and it helps facilitate communication between the containers running on those networks</li>
+<li><code>my_network</code> is the name of the custom network being defined</li>
+<li><code>driver</code> specifies the network driver to be used for the custom network</li>
+</ul>
+<p>A few notes on Docker networks:
+    - The <code>bridge</code> driver is the default network driver in Docker and is suitable for most use cases. It enables communication between containers on the same host and provides automatic DNS resolution for service discovery. Each custom network with the "bridge" driver is isolated from the host's default bridge network and other custom bridge networks
+    - When using the <code>bridge</code> driver, containers on the same network can communicate with each other using their container names as hostnames (e.g., <code>schedule</code>)
+    - Using the <code>host</code> network instead of <code>bridge</code> allows a container to share the network namespace with the host system. This means the container shares the host's network stack, and network ports used by the container are directly mapped to the host</p>
+<h3>app</h3>
+<div class="highlight"><pre><span></span><code><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">'3.8'</span>
+
+<span class="nt">services</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">app</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_app_${ENV}</span>
+<span class="w">    </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">context</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.</span><span class="w"> </span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8001:8001</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mongo_db</span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_network</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"flask"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"run"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"--host"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"0.0.0.0"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"--port"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"8001"</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">env_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.env</span>
+</code></pre></div>
+<ul>
+<li><code>version: '3.8'</code> specifies the version of the Docker Compose file syntax being used - in this case, it's version 3.8</li>
+<li><code>services</code> is the top-level key that defines the services/containers that will be managed by Docker Compose</li>
+<li><code>app</code> the name of the service/container being defined</li>
+<li><code>container_name</code> specifies the custom name for the container that will be created based on this service. The variable <code>${ENV}</code> dynamically sets the suffix based on an environment variable. For example, if the value of <code>${ENV}</code> is "production", the container name will be <code>my_app_production</code>.<ul>
+<li>The <code>.env</code> file should be placed at the root of the project directory next to our <code>docker-compose.yml</code></li>
+</ul>
+</li>
+<li><code>build</code> indicates that the service will be built using a Dockerfile located in the current directory (denoted by <code>.</code>). The <code>context</code> parameter defines the build context, which means the current directory and its subdirectories will be used to find the necessary files for the build</li>
+<li><code>ports</code> exposes ports from the container to the host - it will map port <code>8001</code> from the host to port <code>8001</code> in the container, that means any traffic coming to port <code>8001</code> on the host will be forwarded to port <code>8001</code> of the container</li>
+<li><code>depends_on</code> specifies that this service depends on another service called <code>mongo_db</code>. It ensures that the <code>mongo_db</code> is up and running before this service starts</li>
+<li><code>networks</code> attaches the service to a pre-existing Docker network, this allows both the <code>app</code> service and other services connected to communicate with each other</li>
+<li><code>command</code> overrides the default command in the Dockerfile that would be executed when the container starts. The app will run with the following parameters: <code>flask run --host 0.0.0.0 --port 8001</code>, meaning Flask will listen on all available network interfaces (<code>0.0.0.0</code>) and port <code>8001</code><ul>
+<li>When we define the <code>command</code> parameter in the Docker Compose file for a service, it takes precedence over the default <code>CMD</code> command specified in the Dockerfile</li>
+</ul>
+</li>
+<li><code>env_file</code> specifies the file from which environment variables should be read and passed to the container</li>
+</ul>
+<p>For reference, this is the service's Dockerfile:</p>
+<div class="highlight"><pre><span></span><code><span class="k">FROM</span><span class="w"> </span><span class="s">python:3.8-slim-buster</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s">base</span><span class="w"> </span>
+
+<span class="c"># Create app directory</span>
+<span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
+
+<span class="c"># Install Python requirements first so it's cached</span>
+<span class="k">COPY</span><span class="w"> </span>./requirements.txt<span class="w"> </span>.
+<span class="k">RUN</span><span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+
+<span class="c"># Copy Flask project to container</span>
+<span class="k">COPY</span><span class="w"> </span>.<span class="w"> </span>.
+
+<span class="c"># Set Flask configurations</span>
+<span class="k">ENV</span><span class="w"> </span><span class="nv">FLASK_APP</span><span class="o">=</span>app.py
+<span class="k">ENV</span><span class="w"> </span><span class="nv">FLASK_RUN_HOST</span><span class="o">=</span><span class="m">0</span>.0.0.0
+
+<span class="c">##############</span>
+
+<span class="k">FROM</span><span class="w"> </span><span class="s">base</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s">DEV</span>
+
+<span class="k">RUN</span><span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span>debugger
+<span class="k">RUN</span><span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span>debugpy
+
+<span class="c"># Define Flask environment (production is default)</span>
+<span class="k">ENV</span><span class="w"> </span><span class="nv">FLASK_ENV</span><span class="o">=</span>development<span class="w"> </span>
+
+<span class="k">CMD</span><span class="w"> </span><span class="o">[</span><span class="s2">"python"</span>,<span class="w"> </span><span class="s2">"-m"</span>,<span class="w"> </span><span class="s2">"debugpy"</span>,<span class="se">\</span>
+<span class="w">    </span><span class="s2">"--listen"</span>,<span class="w"> </span><span class="s2">"0.0.0.0:5678"</span>,<span class="se">\</span>
+<span class="w">    </span><span class="s2">"--wait-for-client"</span>,<span class="se">\</span>
+<span class="w">    </span><span class="s2">"-m"</span>,<span class="w"> </span><span class="s2">"flask"</span>,<span class="w"> </span><span class="s2">"run"</span>,<span class="w"> </span><span class="s2">"--host"</span>,<span class="w"> </span><span class="s2">"0.0.0.0"</span>,<span class="w"> </span><span class="s2">"--port"</span>,<span class="w"> </span><span class="s2">"8000"</span><span class="o">]</span>
+
+<span class="c">##############</span>
+
+<span class="k">FROM</span><span class="w"> </span><span class="s">base</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s">PROD</span>
+
+<span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">"flask"</span><span class="p">,</span><span class="w"> </span><span class="s2">"run"</span><span class="p">]</span>
+</code></pre></div>
+<p>We won't get into how to deploy it to production in this article but I wanted to quickly mention that using Gunicorn - a popular WSGI (Web Server Gateway Interface) HTTP server for Python web applications is probably a good idea:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run the app with Gunicorn </span>
+CMD<span class="w"> </span><span class="o">[</span><span class="s2">"gunicorn"</span>,<span class="w"> </span><span class="s2">"--bind"</span>,<span class="w"> </span><span class="s2">"0.0.0.0:8001"</span>,<span class="w"> </span><span class="s2">"our_app:app"</span><span class="o">]</span>
+</code></pre></div>
+<h3>mongo db</h3>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="nt">mongo_db</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mongo_db_${ENV}</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mongo:4.4.18</span>
+<span class="w">    </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">27017:27017</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./DB-STORAGE/mongo-db-$ENV:/data/db</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./db/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh</span><span class="w"> </span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_network</span>
+<span class="w">    </span><span class="nt">env_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.env</span>
+</code></pre></div>
+<ul>
+<li><code>container_name</code> well, we already know :)</li>
+<li><code>image</code> specifies the Docker image to be used for the container. In this case, it's using the official MongoDB image with version <code>4.4.18</code> from Docker Hub</li>
+<li><code>restart</code> indicates the restart policy for the container - <code>always</code> means the container will be automatically restarted if it exits, regardless of the exit status</li>
+<li><code>ports</code> maps port <code>27017</code> from the host to port <code>27017</code> in the container (default MongoDB port)<ul>
+<li>Usually, it's best to keep our database private and only let other services (containers) access it. But for development purposes, we can expose it and use tools like MongoDB Compass</li>
+</ul>
+</li>
+<li>
+<p><code>volumes</code> mounts directories or files from the host into the container. This is used to persist data and configuration files</p>
+<ul>
+<li><code>./DB-STORAGE/mongo-db-$ENV:/data/db</code> will mount a host directory named <code>./DB-STORAGE/mongo-db-$ENV</code> into the <code>/data/db</code> directory inside the container. This allows the MongoDB data to be stored persistently on the host filesystem</li>
+<li><code>./db/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh</code> will mounts the <code>init-mongo.sh</code> file from the host into the <code>/docker-entrypoint-initdb.d/init-mongo.sh</code> path in the container which is the official MongoDB Docker image entry point.</li>
+</ul>
+</li>
+<li>
+<p><code>networks</code> attaches the service to a pre-existing Docker network called "my_network". This allows the MongoDB service and other services connected to "my_network" to communicate with each other.</p>
+</li>
+<li><code>env_file</code> the environment variables from <code>.env</code> file will be used in the entrypoint script (<code>init-mongo.sh</code>) to configure MongoDB settings during startup</li>
+</ul>
+<p>This is the <code>init-mongo.sh</code> file:</p>
+<div class="highlight"><pre><span></span><code>mongo<span class="w"> </span>-u<span class="w"> </span><span class="s2">"</span><span class="nv">$MONGO_INITDB_ROOT_USERNAME</span><span class="s2">"</span><span class="w"> </span>-p<span class="w"> </span><span class="s2">"</span><span class="nv">$MONGO_INITDB_ROOT_PASSWORD</span><span class="s2">"</span><span class="w"> </span>--authenticationDatabase<span class="w"> </span>admin<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+
+<span class="s">use my_db;</span>
+
+<span class="s">db.createUser({</span>
+<span class="s">    user: "$MONGO_USE</span>R<span class="s2">",</span>
+<span class="s2">    pwd: "</span><span class="nv">$MONGO_PASSWORD</span><span class="s2">",</span>
+<span class="s2">    roles: </span>
+<span class="s2">        [</span>
+<span class="s2">            { </span>
+<span class="s2">                role: "</span>readWrite<span class="s2">", </span>
+<span class="s2">                db: "</span>my_db<span class="s2">" </span>
+<span class="s2">            },</span>
+<span class="s2">            { </span>
+<span class="s2">                role: "</span>dbAdmin<span class="s2">", </span>
+<span class="s2">                db: "</span>my_db<span class="s2">" </span>
+<span class="s2">            }     </span>
+<span class="s2">        ] </span>
+<span class="s2">});</span>
+</code></pre></div>
+<blockquote>
+<p>If we want our MongoDB user to have both read/write access to an existing database and the ability to create collections and documents, we should grant it both the <code>readWrite</code> role and the <code>dbAdmin</code> role.</p>
+</blockquote>
+<h3>schedule</h3>
+<div class="highlight"><pre><span></span><code><span class="nt">schedule_service</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">schedule_service_${ENV}</span>
+<span class="w">    </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">context</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./schedule</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./common:/app/common</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./db:/app/db</span><span class="w">  </span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_network</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"python"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"-u"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"schedule.py"</span><span class="p p-Indicator">]</span><span class="w"> </span>
+<span class="w">    </span><span class="nt">env_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.env</span>
+</code></pre></div>
+<ul>
+<li>The <code>context</code> parameter defines the build context, which means the <em>./schedule</em> directory and its subdirectories will be used to find the necessary files for the build</li>
+</ul>
+<blockquote>
+<p>When we're only using a Dockerfile, we can specify the Dockerfile's location and the context (root directory) but when we're working with Docker Compose, we can only specify the context, which means we cannot go up in the directory from where the Dockerfile is
+- <code>docker build -f $RelativePathToSourceCode -t $AppName .</code> - in that case <code>-f $RelativePathToSourceCode</code> defines where our <code>Dockerfile</code> is but the <code>.</code> at the end defines the context (root directory)</p>
+</blockquote>
+<ul>
+<li>In this case, we still want to use some common packages from the application, so we can map them using <code>volumes</code></li>
+<li>We already know that <code>command</code> overrides the default command that would be executed when the container starts. In this case, the script will be executed with the Python interpreter in unbuffered mode (<code>-u</code> flag) to ensure that the output is immediately displayed in the container logs</li>
+</ul>
+<p>In summary, the <code>schedule_service</code> service in the Docker Compose file builds a container from the <code>./schedule</code> directory, mounts specific directories from the host into the container, and runs the Python script <code>schedule.py</code> as the main command for the container. Additionally, it connects the container to the <code>my_network</code> for communication with other services on the same network and reads environment variables from the <code>.env</code> file.</p>
+<h2>Firing it all up</h2>
+<p>Now that we have everything set up, it's time to fire it all up.</p>
+<p>Running <code>docker-compose build --no-cache</code> followed by <code>docker-compose up</code> is the best way to ensure that our Docker containers are built from scratch without using any cached layers from previous builds.</p>
+<p>Alternatively, using <code>docker-compose up --build</code> will rebuild the images for all services, ignoring any previously cached layers. This ensures that we have the latest version of our application and all its dependencies.</p>
+<p>The <code>docker-compose down</code> command both stops and removes containers associated with our Docker Compose project, but the exact behavior depends on the options used with the command.</p>
+<p>By default, <code>docker-compose down</code> does the following:
+- Stops all the containers defined in our <code>docker-compose.yml</code> file that are currently running as part of the project. The containers are gracefully stopped, and their resources are released
+- After stopping the containers, <code>docker-compose down</code> also removes the containers</p>
+<p>To clean it all up, we can use <code>docker-compose down --rmi all</code>.</p>
+</div>
+</article>
+</div>
+</div>
+<footer class="footer">
+<div class="container">
+<div class="row">
+<ul class="col-sm-6 list-inline">
+<li class="list-inline-item"><a href="/authors.html">Authors</a></li>
+<li class="list-inline-item"><a href="/archives.html">Archives</a></li>
+<li class="list-inline-item"><a href="/categories.html">Categories</a></li>
+<li class="list-inline-item"><a href="/tags.html">Tags</a></li>
+</ul>
+<p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">✨</a>
+</p>
+</div> </div>
+</footer>
+</body>
+</html>

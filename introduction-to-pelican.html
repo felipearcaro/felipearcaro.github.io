@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+<title>  Introduction to Pelican | Felipe Arcaro
+</title>
+<link href="/introduction-to-pelican.html" rel="canonical"/>
+<link href="/theme/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/theme/css/fontawesome.min.css" rel="stylesheet"/>
+<link href="/theme/css/pygments/default.min.css" rel="stylesheet"/>
+<link href="/theme/css/theme.css" rel="stylesheet"/>
+<meta content="Pelican's journey to making tech writing cool again (at least for me)" name="description"/>
+</head>
+<body>
+<header class="header">
+<div class="container">
+<div class="row">
+<div class="col-sm-12">
+<h1 class="title"><a href="/">Felipe Arcaro</a></h1>
+</div>
+</div> </div>
+</header>
+<div class="main">
+<div class="container">
+<h1>  Introduction to Pelican
+</h1>
+<hr/>
+<article class="article">
+<header>
+<ul class="list-inline">
+<li class="list-inline-item text-muted" title="2023-08-14T14:29:00+02:00">
+<i class="fas fa-clock"></i>
+          Mon 14 August 2023
+        </li>
+<li class="list-inline-item">
+<i class="fas fa-folder-open"></i>
+<a href="/category/webapp.html">WebApp</a>
+</li>
+<li class="list-inline-item">
+<i class="fas fa-tag"></i>
+<a href="/tag/python.html">#python</a>,               <a href="/tag/staticwebsite.html">#staticwebsite</a>,               <a href="/tag/pelican.html">#pelican</a> </li>
+</ul>
+</header>
+<div class="content">
+<p>This article is part of a series.</p>
+<h4>Getting started with Pelican - Static site generator written in Python</h4>
+<ol>
+<li><strong>[ <a href="/introduction-to-pelican.html">Introduction to Pelican</a> ]</strong></li>
+<li><a href="/adding-different-pelican-themes-to-your-static-website.html">Adding different Pelican themes to your static website</a> </li>
+</ol>
+<hr/>
+<h2>TL;DR</h2>
+<p>In order to create a static website with Pelican, do the following: </p>
+<ul>
+<li>Create a project folder </li>
+<li>Install Pelican and Markdown packages running <code>pip install "pelican[markdown]"</code></li>
+<li>Run  <code>pelican-quickstart</code> and answer the questions that will pop up</li>
+<li>Create an article named <code>my_article.md</code> with the following content:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">Title</span><span class="o">:</span><span class="w"> </span><span class="n">This</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">my</span><span class="w"> </span><span class="n">first</span><span class="w"> </span><span class="n">article</span>
+<span class="n">Date</span><span class="o">:</span><span class="w"> </span><span class="mi">2010</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">03</span><span class="w"> </span><span class="mi">10</span><span class="o">:</span><span class="mi">20</span>
+<span class="n">Category</span><span class="o">:</span><span class="w"> </span><span class="n">Cool</span>
+
+<span class="n">Cool</span><span class="w"> </span><span class="n">content</span><span class="w"> </span><span class="n">goes</span><span class="w"> </span><span class="n">here</span><span class="o">.</span>
+</code></pre></div>
+<ul>
+<li>Run <code>pelican -r -l</code>, open a browser, and navigate to <a href="http://localhost:8000/">http://localhost:8000/</a> to see the website running locally</li>
+</ul>
+<hr/>
+<h1>What is Pelican?</h1>
+<p>Pelican is a static site generator written in Python. </p>
+<p>Here are some of the things I really like about it: </p>
+<ul>
+<li>We can write content in <a href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> or <a href="https://daringfireball.net/projects/markdown/">Markdown</a> formats using whatever tool we're comfortable with (I use Obsidian, by the way)</li>
+<li>It includes a simple CLI tool to generate our website and do some other cool things</li>
+<li>It generates a static website that can be easily hosted anywhere (even on AWS S3!)</li>
+<li>It has really cool open-source community themes and plugins</li>
+</ul>
+<h1>What is a static website?</h1>
+<p>Okay, but what is a static website?</p>
+<p>A static website is a fixed type of site that doesn't change content – it doesn't update based on user interactions or real-time data (no databases!). It's generally made up of HTML, CSS, and sometimes JavaScript files.</p>
+<p>For non-tech people, a static website can be understood as a printed brochure. It's like a picture of information that doesn't change unless someone physically changes the words or pictures on the paper (the developer). </p>
+<p>Because it is so simple, it is normally faster, more reliable, secure, and definitely fun to play with. </p>
+<h1>Why Pelican?</h1>
+<p>I've always struggled with choosing the best writing tool. I've experimented with MailChimp, Medium, Ulysses, Evernote, Notion, Google Docs, and others, and I often find myself switching between them – ultimately spending more time doing that than effectively writing.</p>
+<p>Another thing I've struggled with was deciding on the best way to save and possibly even version control my notes because, at the end of the day, all these other tools would still be responsible for holding my data. </p>
+<p>I've settled with writing my notes/articles as Markdown files (I use Obsidian for that) and storing these files automatically with iCloud for Mac. </p>
+<p>And when I am done with an article or need to edit an article I'd already published, I can simply use Pelican to (re)generate the blog pages.</p>
+<h1>Setting it up</h1>
+<p>As I already mentioned, Pelican is built in Python, so we simply need to install it as a package with PyPI (Python Package Index) and run a few CLI commands. Here are the steps we need to go through:</p>
+<ul>
+<li>Create a project folder</li>
+<li>Install Pelican and Markdown packages (recommended to do it in a Python virtual environment)</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create a Python virtual environment</span>
+python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>env-pelican
+
+<span class="c1"># Activate it on Linux/Mac</span>
+<span class="nb">source</span><span class="w"> </span>env-pelican/bin/activate
+
+<span class="c1"># Activate it on Windows</span>
+./env-pelican/Scripts/activate
+
+<span class="c1"># Install Pelican package</span>
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"pelican[markdown]"</span>
+</code></pre></div>
+<ul>
+<li>Run  <code>pelican-quickstart</code> and answer the questions that will pop up</li>
+<li>Create an article named <code>my_article.md</code> with the following content (you can learn more about Pelican's supported metadata <a href="https://docs.getpelican.com/en/latest/content.html">here</a>)</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">Title</span><span class="o">:</span><span class="w"> </span><span class="n">This</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">my</span><span class="w"> </span><span class="n">first</span><span class="w"> </span><span class="n">article</span>
+<span class="n">Date</span><span class="o">:</span><span class="w"> </span><span class="mi">2010</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">03</span><span class="w"> </span><span class="mi">10</span><span class="o">:</span><span class="mi">20</span>
+<span class="n">Category</span><span class="o">:</span><span class="w"> </span><span class="n">Cool</span>
+
+<span class="n">Cool</span><span class="w"> </span><span class="n">content</span><span class="w"> </span><span class="n">goes</span><span class="w"> </span><span class="n">here</span><span class="o">.</span>
+</code></pre></div>
+<ul>
+<li>Run <code>pelican -r -l</code>, open a browser, and navigate to <a href="http://localhost:8000/">http://localhost:8000/</a> to see the website running locally<ul>
+<li><code>-r</code> flag relaunches pelican each time a modification occurs on the content files</li>
+<li><code>-l</code> flag serves content files via HTTP and port 8000</li>
+</ul>
+</li>
+</ul>
+<p>Here's how your static website will look like:</p>
+<p><img alt="pelican-website" class="image-process-large-photo" sizes="(min-width: 1200px) 800px, (min-width: 992px) 650px, (min-width: 768px) 718px, 100vw" src="/images/derivatives/large-photo/800w/pelican-website.png" srcset="/images/derivatives/large-photo/600w/pelican-website.png 600w, /images/derivatives/large-photo/800w/pelican-website.png 800w, /images/derivatives/large-photo/1600w/pelican-website.png 1600w"/></p>
+</div>
+</article>
+</div>
+</div>
+<footer class="footer">
+<div class="container">
+<div class="row">
+<ul class="col-sm-6 list-inline">
+<li class="list-inline-item"><a href="/authors.html">Authors</a></li>
+<li class="list-inline-item"><a href="/archives.html">Archives</a></li>
+<li class="list-inline-item"><a href="/categories.html">Categories</a></li>
+<li class="list-inline-item"><a href="/tags.html">Tags</a></li>
+</ul>
+<p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">✨</a>
+</p>
+</div> </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+<title>  Creating an AWS RDS instance with Terraform | Felipe Arcaro
+</title>
+<link href="/creating-an-aws-rds-instance-with-terraform.html" rel="canonical"/>
+<link href="/theme/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/theme/css/fontawesome.min.css" rel="stylesheet"/>
+<link href="/theme/css/pygments/default.min.css" rel="stylesheet"/>
+<link href="/theme/css/theme.css" rel="stylesheet"/>
+<meta content="Bottom line, try to avoid terraform import" name="description"/>
+</head>
+<body>
+<header class="header">
+<div class="container">
+<div class="row">
+<div class="col-sm-12">
+<h1 class="title"><a href="/">Felipe Arcaro</a></h1>
+</div>
+</div> </div>
+</header>
+<div class="main">
+<div class="container">
+<h1>  Creating an AWS RDS instance with Terraform
+</h1>
+<hr/>
+<article class="article">
+<header>
+<ul class="list-inline">
+<li class="list-inline-item text-muted" title="2023-09-18T18:34:00+02:00">
+<i class="fas fa-clock"></i>
+          Mon 18 September 2023
+        </li>
+<li class="list-inline-item">
+<i class="fas fa-folder-open"></i>
+<a href="/category/devops.html">DevOps</a>
+</li>
+<li class="list-inline-item">
+<i class="fas fa-tag"></i>
+<a href="/tag/terraform.html">#terraform</a>,               <a href="/tag/dataops.html">#dataops</a>,               <a href="/tag/devops.html">#devops</a>,               <a href="/tag/cloud.html">#cloud</a> </li>
+</ul>
+</header>
+<div class="content">
+<p>This article is part of a series.</p>
+<h4>Understanding the basics of Terraform</h4>
+<ol>
+<li><a href="/introduction-to-terraform.html">Introduction to Terraform</a></li>
+<li><strong>[ <a href="/creating-an-aws-rds-instance-with-terraform.html">Creating an AWS RDS instance with Terraform</a> ]</strong></li>
+<li><a href="/creating-an-aws-ec2-instance-with-terraform.html">Creating an AWS EC2 instance with Terraform</a></li>
+<li><a href="/creating-an-aws-iam-role-with-terraform.html">Creating an AWS IAM role with Terraform</a></li>
+<li><a href="/creating-an-aws-iam-user-with-terraform.html">Creating an AWS IAM user with Terraform</a></li>
+</ol>
+<hr/>
+<h2>TL;DR</h2>
+<p>Here's the Terraform code to create an RDS Postgres instance:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># RDS instance</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_db_instance"</span><span class="w"> </span><span class="nv">"my_project_db"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">engine</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="s2">"postgres"</span>
+<span class="w">  </span><span class="na">instance_class</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">"db.t3.micro"</span>
+<span class="w">  </span><span class="na">username</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">"sidewalk"</span>
+<span class="w">  </span><span class="na">password</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">"${var.postgres_pw}"</span>
+<span class="w">  </span><span class="na">allocated_storage</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="m">20</span>
+<span class="w">  </span><span class="na">publicly_accessible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">true</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2>Creating an RDS instance</h2>
+<p>Amazon Relational Database Service (RDS) is a managed database service provided by AWS that simplifies the process of setting up, operating, and scaling a relational database in the cloud.</p>
+<p>Here is a quick recap of some RDS notable features:
+- Multi-AZ
+    - Supports standby instance in another AZ that helps with failure recover 
+- Read replicas
+    - Offload read requests
+    - Can be used in disaster recovery plan
+- Automatic backups
+    - Configurable time window
+- Configurable storage 
+- IAM authentication
+- RDS Enhance monitoring </p>
+<h3>Starting in the Management Console (UI)</h3>
+<p>First, we create a free RDS Postgres instance through the Management Console. Since this was the first AWS service on this account, it automatically created a VPC <sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> and a Security Group <sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup> to ensure the instance was securely isolated and protected by a firewall.</p>
+<p>To see if the Postgres database is working, we can use PGAdmin, but we also need to go through the following steps:</p>
+<ul>
+<li>Make the RDS instance publicly available</li>
+<li>Add our personal IP to the Security Group's inbound rules used by the database so we can connect to it from outside the VPC (our personal computer):<ul>
+<li>Although not recommended, we can all ports <code>0-655353</code> and all IPs <code>0.0.0.0/0</code> to the inbound rules so everyone can connect to our database</li>
+</ul>
+</li>
+</ul>
+<p>Everything seems to be working as expected. </p>
+<h3>Importing existing resources to Terraform code</h3>
+<p>Now, let's start with <code>terraform import</code> to import my database instance to my configuration file so I can manage it from there.</p>
+<p>First, we create the most basic version of the <code>aws_db_instance</code> resource on our Terraform <code>main.tf</code> file:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_db_instance"</span><span class="w"> </span><span class="nv">"my_project_db"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">engine</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="s2">"postgres"</span>
+<span class="w">  </span><span class="na">instance_class</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">"db.t2.micro"</span>
+<span class="w">  </span><span class="na">username</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">"sidewalk"</span>
+<span class="w">  </span><span class="na">password</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">"${var.postgres_pw}"</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>You probably noticed we're using a variable instead of writing the password in plain text. Here's the easiest way to do it:</p>
+<ul>
+<li>Create a file called <code>vars.tf</code> in the same folder as the <code>main.tf</code> file and add the following code to it:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kr">variable</span><span class="w"> </span><span class="nv">"super_secret_password"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ThisPassword123!"</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Now you can call it from your main terraform code like this <code>${var.super_secret_password}</code></p>
+<p>Ok, now it's time to run <code>terraform import aws_instance.my_project_db &lt;db-instance-id&gt;</code> (you can find the <code>&lt;db-instance-id&gt;</code> in the Management Console) – it seems like the database was imported successfully.</p>
+<p>There was a small problem though – the database we created through the Management Console had the parameter <code>instance_class = db.t3.micro</code> while our Terraform code had <code>instance_class = db.t2.micro</code>. </p>
+<p>When we run <code>terraform plan</code>, it says that a particular resource <em>must be replaced</em>. Then, when we run <code>terraform apply</code>, the database created through the Management Console is deleted and we get an error saying there were some important parameters missing to create the new one – in this case, the <code>allocated_storage</code> parameter.</p>
+<h3>Key learnings on using <code>terraform import</code>:</h3>
+<ul>
+<li>To import an existing infrastructure from AWS, you must have the resource in the Terraform code with all required parameters</li>
+<li>Make sure the configuration you have on your configuration file matches exactly what you have on AWS</li>
+<li><code>terraform plan</code> won't show if there are required parameters missing, only <code>terraform apply</code></li>
+</ul>
+<h3>Creating resources from Terraform code</h3>
+<p>Now that we know how this works, let's go ahead and create the database directly from the Terraform code using <a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_instance">AWS documentation</a> on <code>aws_db_instance</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_db_instance"</span><span class="w"> </span><span class="nv">"my_project_db"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">engine</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="s2">"postgres"</span>
+<span class="w">  </span><span class="na">instance_class</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">"db.t3.micro"</span>
+<span class="w">  </span><span class="na">username</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">"sidewalk"</span>
+<span class="w">  </span><span class="na">password</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">"${var.postgres_pw}"</span>
+<span class="w">  </span><span class="na">allocated_storage</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="m">20</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>We can run <code>terraform plan</code> to make sure everything is looking good and <code>terraform apply</code> to create the database. After the database is created, we can type <code>terraform show</code> to see the infrastructure's current state – the VPC, the Security Group, etc.</p>
+<h3>Key learnings on creating infrastructure using Terraform code:</h3>
+<ul>
+<li>It automatically created it on the only VPC available on that AWS account</li>
+<li>It automatically added the only Security Group available on that AWS account</li>
+</ul>
+<p>And here's the updated Terraform code to make the RDS instance publicly accessible:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># RDS instance</span>
+<span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_db_instance"</span><span class="w"> </span><span class="nv">"my_project_db"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">engine</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="s2">"postgres"</span>
+<span class="w">  </span><span class="na">instance_class</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">"db.t3.micro"</span>
+<span class="w">  </span><span class="na">username</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">"sidewalk"</span>
+<span class="w">  </span><span class="na">password</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s2">"${var.postgres_pw}"</span>
+<span class="w">  </span><span class="na">allocated_storage</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="m">20</span>
+<span class="w">  </span><span class="na">publicly_accessible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">true</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="footnote">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>VPC – Virtual Private Cloud is a virtual network infrastructure that allows you to create a logically isolated network environment. It is essentially a virtual data center in the cloud <a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">↩</a></p>
+</li>
+<li id="fn:2">
+<p>A Security Group is a virtual firewall that controls the inbound and outbound traffic for one or more instances. Every instance within a VPC in AWS must be associated with at least one security group. <a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">↩</a></p>
+</li>
+</ol>
+</div>
+</div>
+</article>
+</div>
+</div>
+<footer class="footer">
+<div class="container">
+<div class="row">
+<ul class="col-sm-6 list-inline">
+<li class="list-inline-item"><a href="/authors.html">Authors</a></li>
+<li class="list-inline-item"><a href="/archives.html">Archives</a></li>
+<li class="list-inline-item"><a href="/categories.html">Categories</a></li>
+<li class="list-inline-item"><a href="/tags.html">Tags</a></li>
+</ul>
+<p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">✨</a>
+</p>
+</div> </div>
+</footer>
+</body>
+</html>

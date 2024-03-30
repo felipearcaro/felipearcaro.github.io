@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+<title>  Introduction to Terraform | Felipe Arcaro
+</title>
+<link href="/introduction-to-terraform.html" rel="canonical"/>
+<link href="/theme/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/theme/css/fontawesome.min.css" rel="stylesheet"/>
+<link href="/theme/css/pygments/default.min.css" rel="stylesheet"/>
+<link href="/theme/css/theme.css" rel="stylesheet"/>
+<meta content="Unlocking the mysteries of Terraform – sort of" name="description"/>
+</head>
+<body>
+<header class="header">
+<div class="container">
+<div class="row">
+<div class="col-sm-12">
+<h1 class="title"><a href="/">Felipe Arcaro</a></h1>
+</div>
+</div> </div>
+</header>
+<div class="main">
+<div class="container">
+<h1>  Introduction to Terraform
+</h1>
+<hr/>
+<article class="article">
+<header>
+<ul class="list-inline">
+<li class="list-inline-item text-muted" title="2023-07-10T22:34:00+02:00">
+<i class="fas fa-clock"></i>
+          Mon 10 July 2023
+        </li>
+<li class="list-inline-item">
+<i class="fas fa-folder-open"></i>
+<a href="/category/devops.html">DevOps</a>
+</li>
+<li class="list-inline-item">
+<i class="fas fa-tag"></i>
+<a href="/tag/terraform.html">#terraform</a>,               <a href="/tag/dataops.html">#dataops</a>,               <a href="/tag/devops.html">#devops</a>,               <a href="/tag/cloud.html">#cloud</a> </li>
+</ul>
+</header>
+<div class="content">
+<p>This article is part of a series.</p>
+<h4>Understanding the basics of Terraform</h4>
+<ol>
+<li><strong>[ <a href="/introduction-to-terraform.html">Introduction to Terraform</a> ]</strong></li>
+<li><a href="/creating-an-aws-rds-instance-with-terraform.html">Creating an AWS RDS instance with Terraform</a></li>
+<li><a href="/creating-an-aws-ec2-instance-with-terraform.html">Creating an AWS EC2 instance with Terraform</a></li>
+<li><a href="/creating-an-aws-iam-role-with-terraform.html">Creating an AWS IAM role with Terraform</a></li>
+<li><a href="/creating-an-aws-iam-user-with-terraform.html">Creating an AWS IAM user with Terraform</a></li>
+</ol>
+<hr/>
+<h2>TL;DR</h2>
+<p>Terraform is a tool used in the field of infrastructure as code (IaC) to create and manage computer resources – servers, networks, databases, and so on. It allows us to define a desired infrastructure in a configuration file using a simple and declarative language.</p>
+<p>Once a Terraform project is started, the state of the managed infrastructure and configuration needs to be stored somewhere - usually locally or on AWS S3. Then, that state file is used by Terraform essentially to map real-world resources to our configuration file and keep track of metadata.</p>
+<p>Here are some important Terraform commands to know:</p>
+<ul>
+<li><code>terraform plan</code>: Generates an execution plan, showing changes to infrastructure resources that would be made when applied</li>
+<li><code>terraform apply</code>: Applies the changes defined in Terraform configuration to create or update infrastructure resources</li>
+<li><code>terraform destroy</code>: Destroys and removes all resources created by Terraform for a given configuration</li>
+<li><code>terraform show</code>: Displays the current state or details of Terraform-managed resources</li>
+<li><code>terraform import</code>: Imports existing infrastructure resources into Terraform's state for management</li>
+</ul>
+<hr/>
+<h2>What is Terraform?</h2>
+<p>Before we jump into coding things out, let's go over some key concepts of Terraform.</p>
+<p>Terraform is a tool used in the field of infrastructure as code (IaC) to create and manage computer resources – servers, networks, databases, and so on. It allows us to define a desired infrastructure in a configuration file using a simple and declarative language.</p>
+<p>Once we have defined our infrastructure configuration, Terraform takes care of provisioning and managing the resources. It interacts with cloud providers like Amazon Web Services (AWS) to create and update infrastructure based on the configuration provided in the file.</p>
+<p>Using Terraform enables us to treat infrastructure as code – we can version control it, collaborate with others, and easily replicate or rebuild it in a consistent and repeatable manner.</p>
+<p>And since we're going to be provisioning infrastructure in AWS, it's also important to understand the difference between a resource, an instance, and a service.</p>
+<ul>
+<li>A resource is a logical entity that represents a piece of AWS infrastructure – an S3 bucket, an EC2 instance, an RDS database</li>
+<li>An instance is a specific occurrence of a resource that is created from a particular template or configuration – an  EC2 instance is a virtual server that is launched from an Amazon Machine Image (AMI). Each instance is a unique copy of the AMI, with its own IP address, storage, and other attributes</li>
+<li>A service is a collection of related AWS resources and API operations that work together to perform a specific function – AWS offers over 200 different services, including compute, storage, database, analytics, machine learning, and more</li>
+</ul>
+<h2>Getting the environment ready</h2>
+<p>There are a few steps we need to go through in order to get our development environment ready: </p>
+<ul>
+<li>Install <a href="https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html">AWS CLI</a><ul>
+<li>Run <code>aws configure</code> on the terminal and provide the following parameters<ul>
+<li><code>AWS Access Key ID</code> </li>
+<li><code>AWS Secret Access Key</code></li>
+<li><code>Default region name</code></li>
+<li><code>Default output format</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Install <a href="https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli">Terraform CLI</a></li>
+</ul>
+<h2>Project structure</h2>
+<p>Here's the project structure we are working with:</p>
+<div class="highlight"><pre><span></span><code>my-project/
+└── terraform/
+    └── main.tf
+</code></pre></div>
+<p>And here's the boilerplate code we're starting with:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Specify AWS resource</span>
+<span class="nb">terraform</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nb">required_providers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nb">aws</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="na">source</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">"hashicorp/aws"</span>
+<span class="w">      </span><span class="na">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"~&gt; 4.0"</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1"># Configure the AWS Provider</span>
+<span class="kr">provider</span><span class="w"> </span><span class="nv">"aws"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">region</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"us-east-1"</span>
+<span class="p">}</span>
+
+<span class="c1"># Define where the state will be stored</span>
+<span class="nb">terraform</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kr">backend</span><span class="w"> </span><span class="nv">"local"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">".tfstate"</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>To start the Terraform project, we navigate to the <em>my-project/terraform/</em> directory and run <code>terraform init</code> which essentially downloads all necessary modules and defines the backend.</p>
+<h2>Wait, what is this backend thing?</h2>
+<p>To understand what the Terraform backend is, let's quickly cover what a Terraform state is first.</p>
+<p>You probably saw some state-related code in the code snippet I provided earlier:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Define where the state will be stored</span>
+<span class="nb">terraform</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kr">backend</span><span class="w"> </span><span class="nv">"local"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">".tfstate"</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Once a Terraform project is started, the state of the managed infrastructure and configuration needs to be stored somewhere, and that state is used by Terraform essentially to map real-world resources to our configuration file and keep track of metadata.</p>
+<p>Here are some key aspects of the Terraform state:</p>
+<ul>
+<li>Its primary purpose is to store bindings between objects in a remote system (e.g. an EC2 instance) and resource instances declared in a configuration file</li>
+<li>It's generally saved in a file called <code>terraform.tfstate</code></li>
+<li>It can be stored locally – recommended for developing purposes</li>
+<li>It can be stored in the cloud (e.g S3) – recommended for deployment purposes, so it can be versioned, encrypted, and securely shared</li>
+</ul>
+<p>The backend simply defines where Terraform stores its state.</p>
+<h2>How to "run" terraform code</h2>
+<p>We already have some Terraform code, can't we just run it? Kinda. Let's take a look at the following commands:</p>
+<ul>
+<li><code>terraform plan</code></li>
+<li><code>terraform apply</code></li>
+<li><code>terraform destroy</code></li>
+<li><code>terraform show</code></li>
+<li><code>terraform import</code></li>
+</ul>
+<h3>Terraform plan</h3>
+<p>The <code>terraform plan</code> command creates a plan. It can be used to preview the planned changes to the infrastructure.</p>
+<p>Under the hood, the command:</p>
+<ul>
+<li>Reads the current state of any remote objects to make sure that the Terraform state is up-to-date</li>
+<li>Compares the current configuration to the prior state and notes any differences</li>
+<li>Proposes a set of change actions that should, if applied, make the remote objects match the configuration</li>
+</ul>
+<h3>Terraform apply</h3>
+<p>The <code>terraform plan</code> command applies the changes to the infrastructure to get to the state where the remote objects match the configuration. <code>terraform apply</code> can be run without running <code>terraform plan</code> first although it's not recommended.</p>
+<h3>Terraform destroy</h3>
+<p>The <code>terraform destroy</code> command is used to destroy all mapped objects. <code>terraform plan -destroy</code> can be used to see what destruction will be made beforehand.</p>
+<p>It is also worth mentioning that if the infrastructure has already been provisioned with <code>terraform apply</code>, removing objects from the Terraform code and running <code>terraform apply</code> again will also destroy them.</p>
+<h3>Terraform show</h3>
+<p>The <code>terraform show</code> command can be used at any time to inspect the configuration of a Terraform state.</p>
+<h3>Terraform import</h3>
+<p>The <code>terraform import</code> command can be used for bringing existing resources under Terraform management.</p>
+<p>With that in our toolkit, it's time to get our hands dirty.</p>
+</div>
+</article>
+</div>
+</div>
+<footer class="footer">
+<div class="container">
+<div class="row">
+<ul class="col-sm-6 list-inline">
+<li class="list-inline-item"><a href="/authors.html">Authors</a></li>
+<li class="list-inline-item"><a href="/archives.html">Archives</a></li>
+<li class="list-inline-item"><a href="/categories.html">Categories</a></li>
+<li class="list-inline-item"><a href="/tags.html">Tags</a></li>
+</ul>
+<p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">✨</a>
+</p>
+</div> </div>
+</footer>
+</body>
+</html>

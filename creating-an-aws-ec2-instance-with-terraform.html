@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+<title>  Creating an AWS EC2 instance with Terraform | Felipe Arcaro
+</title>
+<link href="/creating-an-aws-ec2-instance-with-terraform.html" rel="canonical"/>
+<link href="/theme/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/theme/css/fontawesome.min.css" rel="stylesheet"/>
+<link href="/theme/css/pygments/default.min.css" rel="stylesheet"/>
+<link href="/theme/css/theme.css" rel="stylesheet"/>
+<meta content="Just a regular computer but in the cloud... Cool, right?" name="description"/>
+</head>
+<body>
+<header class="header">
+<div class="container">
+<div class="row">
+<div class="col-sm-12">
+<h1 class="title"><a href="/">Felipe Arcaro</a></h1>
+</div>
+</div> </div>
+</header>
+<div class="main">
+<div class="container">
+<h1>  Creating an AWS EC2 instance with Terraform
+</h1>
+<hr/>
+<article class="article">
+<header>
+<ul class="list-inline">
+<li class="list-inline-item text-muted" title="2023-09-25T18:34:00+02:00">
+<i class="fas fa-clock"></i>
+          Mon 25 September 2023
+        </li>
+<li class="list-inline-item">
+<i class="fas fa-folder-open"></i>
+<a href="/category/devops.html">DevOps</a>
+</li>
+<li class="list-inline-item">
+<i class="fas fa-tag"></i>
+<a href="/tag/terraform.html">#terraform</a>,               <a href="/tag/dataops.html">#dataops</a>,               <a href="/tag/devops.html">#devops</a>,               <a href="/tag/cloud.html">#cloud</a> </li>
+</ul>
+</header>
+<div class="content">
+<p>This article is part of a series.</p>
+<h4>Understanding the basics of Terraform</h4>
+<ol>
+<li><a href="/introduction-to-terraform.html">Introduction to Terraform</a></li>
+<li><a href="/creating-an-aws-rds-instance-with-terraform.html">Creating an AWS RDS instance with Terraform</a></li>
+<li><strong>[ <a href="/creating-an-aws-ec2-instance-with-terraform.html">Creating an AWS EC2 instance with Terraform</a> ]</strong></li>
+<li><a href="/creating-an-aws-iam-role-with-terraform.html">Creating an AWS IAM role with Terraform</a></li>
+<li><a href="/creating-an-aws-iam-user-with-terraform.html">Creating an AWS IAM user with Terraform</a></li>
+</ol>
+<hr/>
+<h2>TL;DR</h2>
+<p>Here's the Terraform code to create an EC2 instance:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_instance"</span><span class="w"> </span><span class="nv">"my_project_ec2"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">instance_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"t2.micro"</span>
+<span class="w">  </span><span class="na">ami</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ami-06e46074ae430fba6"</span>
+<span class="w">  </span><span class="nb">tags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">Name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-python-project"</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2>EC2 Instance (Elastic Compute Cloud)</h2>
+<p>Elastic Compute Cloud (EC2) is a virtual server provided by AWS that allows you to run applications and services in the cloud - it's just a regular computer but in the cloud.</p>
+<p>EC2 is awesome because:</p>
+<ul>
+<li>We don't need to invest in infrastructure upfront</li>
+<li>It allows us to scale up/down (vertically) to handle different workloads</li>
+<li>It offers different purchasing options (on demand, reserved, spot)</li>
+</ul>
+<h3>Terraform it up</h3>
+<p>We're past the basics now, so let's create an EC2 instance. Here's the code to do it:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">resource</span><span class="w"> </span><span class="nc">"aws_instance"</span><span class="w"> </span><span class="nv">"my_project_ec2"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">instance_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"t2.micro"</span>
+<span class="w">  </span><span class="na">ami</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ami-06e46074ae430fba6"</span>
+<span class="w">  </span><span class="nb">tags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">Name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-python-project"</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<blockquote>
+<p>The resource name <code>my-python-project</code> that comes after the resource type <code>aws_instance</code> is not the same as the resource name that appears in the Admin Console. For that, I had to use <code>tags</code> parameter.</p>
+</blockquote>
+<p>Once again, the infrastructure is updated after we run <code>terraform plan</code> and <code>terraform apply</code> and a new EC2 instance is created.i</p>
+<h3>Wait, what is AMI?</h3>
+<p>Amazon Machine Image (AMI) is a pre-configured package required to launch an EC2 instance that includes an operating system, software packages and other requirements. It's essentially a template that can be used to launch EC2 instances (Linux, Windows or Mac)</p>
+<p>AMI is awesome because:</p>
+<ul>
+<li>We don't need to manually install packages and requirements</li>
+<li>We can launch several EC2 with the same configuration (load balancing)</li>
+<li>When selecting the AMI, we can use the Advanced Details tab to run a bash script (e.g. to update <code>yum</code> and install <code>httpd</code>)</li>
+</ul>
+<p>Ok. So far, we have a computer where we can run our project and a database in which we can persist and read data. Now it's time to give them proper access - in other words, we have to specify what AWS resources and who should be able to access them.</p>
+</div>
+</article>
+</div>
+</div>
+<footer class="footer">
+<div class="container">
+<div class="row">
+<ul class="col-sm-6 list-inline">
+<li class="list-inline-item"><a href="/authors.html">Authors</a></li>
+<li class="list-inline-item"><a href="/archives.html">Archives</a></li>
+<li class="list-inline-item"><a href="/categories.html">Categories</a></li>
+<li class="list-inline-item"><a href="/tags.html">Tags</a></li>
+</ul>
+<p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">✨</a>
+</p>
+</div> </div>
+</footer>
+</body>
+</html>
