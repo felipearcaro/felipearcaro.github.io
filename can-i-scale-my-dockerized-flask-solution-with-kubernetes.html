@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+<title>  Can I scale my dockerized Flask solution with Kubernetes? | Felipe Arcaro's blog
+</title>
+<link href="/can-i-scale-my-dockerized-flask-solution-with-kubernetes.html" rel="canonical"/>
+<link href="/theme/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/theme/css/fontawesome.min.css" rel="stylesheet"/>
+<link href="/theme/css/pygments/autumn.min.css" rel="stylesheet"/>
+<link href="/theme/css/theme.css" rel="stylesheet"/>
+<meta content="Is it time to finally surrender to Kubernetes?" name="description"/>
+</head>
+<body>
+<header class="header">
+<div class="container">
+<div class="row">
+<div class="col-sm-12">
+<h1 class="title"><a href="/">Felipe Arcaro's blog</a></h1>
+</div>
+</div> </div>
+</header>
+<div class="main">
+<div class="container">
+<h1>  Can I scale my dockerized Flask solution with Kubernetes?
+</h1>
+<hr/>
+<article class="article">
+<header>
+<ul class="list-inline">
+<li class="list-inline-item text-muted" title="2024-04-06T13:08:00+02:00">
+<i class="fas fa-clock"></i>
+          Sat 06 April 2024
+        </li>
+<li class="list-inline-item">
+<i class="fas fa-folder-open"></i>
+<a href="/category/devops.html">DevOps</a>
+</li>
+<li class="list-inline-item">
+<i class="fas fa-tag"></i>
+<a href="/tag/flask.html">#flask</a>,               <a href="/tag/kubernetes.html">#kubernetes</a>,               <a href="/tag/docker.html">#docker</a> </li>
+</ul>
+</header>
+<div class="content">
+<p>This article is part of a series.</p>
+<h4>Getting into Docker &amp; Kubernetes</h4>
+<ol>
+<li><a href="/dockerizing-a-flask-application.html">Dockerizing a Flask Application</a></li>
+<li><strong><a href="/can-i-scale-my-dockerized-flask-solution-with-kubernetes.html">Can I scale my dockerized Flask solution with Kubernetes?</a></strong></li>
+</ol>
+<hr/>
+<h2>TL;DR</h2>
+<p>Yes - with some work.</p>
+<p>Here are the steps:</p>
+<ul>
+<li>Install <a href="https://kompose.io/">Kompose</a> - a conversion tool that allows you to convert your Docker Compose code to Kubernetes configuration files<ul>
+<li>Run <code>kompose convert</code> in the same directory as your <code>docker-compose.yml</code> to generate the config files for your Kubernetes cluster</li>
+</ul>
+</li>
+<li>Install <a href="https://github.com/kubernetes/minikube">Minicube</a> - a tool that allows us to spin up a Kubernetes cluster in a local machine<ul>
+<li>Run <code>minikube start</code> to start your Kubernetes cluster</li>
+<li>Run <code>minikube dashboard</code> to spin up a web-based user interface that allows you to manage your Kubernetes cluster</li>
+</ul>
+</li>
+<li>Install <a href="https://kubernetes.io/docs/reference/kubectl/">kubectl</a> - a CLI tool provided by Kubernetes for communicating with a Kubernetes cluster's control plane using the Kubernetes API<ul>
+<li>Run <code>kubectl apply -f &lt;filename&gt;</code> to apply your services/deployments</li>
+</ul>
+</li>
+</ul>
+<hr/>
+<p>Let's consider the following scenario - our application has gained popularity and is attracting a large number of users and, to keep up with that, we need a way of handling increased traffic.</p>
+<p>We could vertically scale - that is, allocate more resources to our containers:</p>
+<p><img alt="app" class="image-process-large-photo" sizes="(min-width: 1200px) 800px, (min-width: 992px) 650px, (min-width: 768px) 718px, 100vw" src="/images/derivatives/large-photo/800w/app.png" srcset="/images/derivatives/large-photo/600w/app.png 600w, /images/derivatives/large-photo/800w/app.png 800w, /images/derivatives/large-photo/1600w/app.png 1600w"/></p>
+<p>But instead, we want to horizontally scale it by creating multiple copies of the containers and distributing traffic among them:</p>
+<p><img alt="app-horizontal" class="image-process-large-photo" sizes="(min-width: 1200px) 800px, (min-width: 992px) 650px, (min-width: 768px) 718px, 100vw" src="/images/derivatives/large-photo/800w/app-horizontal.png" srcset="/images/derivatives/large-photo/600w/app-horizontal.png 600w, /images/derivatives/large-photo/800w/app-horizontal.png 800w, /images/derivatives/large-photo/1600w/app-horizontal.png 1600w"/></p>
+<p>And as you probably guessed by the title of this post, we're going to use Kubernetes for that.</p>
+<h2>Wait... isn't Kubernetes and Docker the same thing?</h2>
+<p>Not really. Docker focuses on creating and running containers, while Kubernetes is a container orchestration platform that manages the deployment, scaling, and operations of those containers in a cluster.</p>
+<p>You can think of Docker as the chef who prepares individual dishes (containers) in the kitchen, ensuring they're well-packaged and portable, while Kubernetes serves as the restaurant manager who orchestrates the dining experience, seating guests (users) at tables (containers), coordinating servers (nodes), and managing the overall flow of the restaurant to ensure a delightful dining service..</p>
+<h2>What is Kubernetes?</h2>
+<p>Kubernetes, often referred to as k8s, is an open-source container orchestration engine designed to automate the deployment, scaling, and management of containerized applications. It aims to simplify application management, ensure high availability via replica sets, and facilitate scalability. </p>
+<p>By abstracting the underlying infrastructure, Kubernetes offers a declarative approach to define the desired state of applications and their dependencies using YAML files.</p>
+<h2>Kubernetes' architecture</h2>
+<p>Deploying Kubernetes creates a cluster, consisting of worker nodes running containerized applications. Each cluster has at least one worker node, hosting Pods, which form the application workload. The control plane manages these nodes and Pods. In production, the control plane typically runs across multiple computers for fault-tolerance and high availability.</p>
+<p><img alt="kubernetes architecture" class="image-process-large-photo" sizes="(min-width: 1200px) 800px, (min-width: 992px) 650px, (min-width: 768px) 718px, 100vw" src="/images/derivatives/large-photo/800w/kubernetes architecture.png" srcset="/images/derivatives/large-photo/600w/kubernetes architecture.png 600w, /images/derivatives/large-photo/800w/kubernetes architecture.png 800w, /images/derivatives/large-photo/1600w/kubernetes architecture.png 1600w"/></p>
+<p>Let's take a quick look at Kubernetes' main components.</p>
+<h3>Control Plane:</h3>
+<ul>
+<li>kube-apiserver: Exposes the Kubernetes API for cluster management</li>
+<li>etcd: Stores all cluster data reliably</li>
+<li>kube-scheduler: Assigns nodes for newly created Pods</li>
+<li>kube-controller-manager: Runs controller processes to manage cluster state.</li>
+<li>cloud-controller-manager: Integrates cloud-specific control logic (if applicable).</li>
+</ul>
+<h3>Node:</h3>
+<ul>
+<li>kubelet Ensures containers described in PodSpecs are running and healthy.</li>
+<li>kube-proxy: Maintains network rules for network communication to Pods.</li>
+<li>Container runtime: Manages execution and lifecycle of containers within Kubernetes.</li>
+</ul>
+<p>You can learn more about it on <a href="https://kubernetes.io/docs/concepts/overview/components/">Kubernete's official page</a>.</p>
+<h2>Getting to work</h2>
+<p>Enough theory, let's get to work.</p>
+<p>For this experiment, we're going to need three tools:</p>
+<ul>
+<li><a href="https://kompose.io/">Kompose</a> - a conversion tool that allows us to convert our Docker Compose code to Kubernetes configuration files</li>
+<li><a href="https://github.com/kubernetes/minikube">Minicube</a> - a tool that allows us to spin up a Kubernetes cluster in a local machine</li>
+<li><a href="https://kubernetes.io/docs/reference/kubectl/">kubectl</a> - a CLI tool provided by Kubernetes for communicating with a Kubernetes cluster's control plane using the Kubernetes API</li>
+</ul>
+<h3>Converting our <code>docker-compose.yml</code> file</h3>
+<p>Once we have all of those installed, we will start converting our <code>docker-compose</code> file running <code>kompose convert</code> in the same directory as our <code>docker-compose.yml</code> file. </p>
+<p>A few files were created in that directory:
+- <code>env-configmap.yaml</code>
+- <code>mongo-db-claim0-persistentvolumeclaim.yaml</code>
+- <code>mongo-db-claim1-persistentvolumeclaim.yaml</code>
+- <code>mongo-db-service.yaml</code>
+- <code>mongo-db-deployment.yaml</code>
+- <code>app-service.yaml
+-</code>app-deployment.yaml<code>-</code>schedule-service-claim0-persistentvolumeclaim.yaml<code>-</code>schedule-service-claim1-persistentvolumeclaim.yaml<code>-</code>schedule-service-service.yaml<code>-</code>schedule-service-deployment.yaml`</p>
+<h3>Firing it all up</h3>
+<p>I am not super familiar with <a href="https://helm.sh/">Helm</a> but I think one of its features is to manage dependencies between those files, allowing us to run all of them in a <code>docker-compose up</code> style. </p>
+<p>For this post, let's do everything manually and cover the details on the <code>app</code> files.</p>
+<p>We'll start exposing our variables:
+- <code>kubectl apply -f env-configmap.yaml</code></p>
+<p>Then spinning up up our Mongo DB service running: 
+-  <code>kubectl apply -f mongo-db-claim0-persistentvolumeclaim.yaml</code>
+- <code>kubectl apply -f mongo-db-claim1-persistentvolumeclaim.yaml</code>
+- <code>kubectl apply -f mongo-db-service.yaml</code>
+- <code>kubectl apply -f mongo-db-deployment.yaml</code></p>
+<p>And now, we can spin up our Flask application:
+- <code>kubectl apply -f app-service.yaml</code>
+- <code>kubectl apply -f app-deployment.yaml</code></p>
+<p>Let's take a deeper looker into these two files files:</p>
+<p>app-service.yaml:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Service</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">annotations</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">kompose.cmd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kompose convert</span>
+<span class="w">    </span><span class="nt">kompose.version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.32.0 (HEAD)</span>
+<span class="w">  </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">io.kompose.service</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">'8001'</span>
+<span class="w">      </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8001</span>
+<span class="w">      </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8001</span>
+<span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">io.kompose.service</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
+</code></pre></div>
+<p>app-deployment.yaml:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apps/v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deployment</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">annotations</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">kompose.cmd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kompose convert</span>
+<span class="w">    </span><span class="nt">kompose.version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.32.0 (HEAD)</span>
+<span class="w">  </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">io.kompose.service</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">io.kompose.service</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
+<span class="w">  </span><span class="nt">template</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">metadata</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">annotations</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">kompose.cmd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kompose convert</span>
+<span class="w">        </span><span class="nt">kompose.version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.32.0 (HEAD)</span>
+<span class="w">      </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">io.kompose.network/test-kompose-my-network</span><span class="p">:</span><span class="w"> </span><span class="s">'true'</span>
+<span class="w">        </span><span class="nt">io.kompose.service</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
+<span class="w">    </span><span class="nt">spec</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">containers</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flask</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">run</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'--host'</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0.0.0</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'--port'</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'8001'</span>
+<span class="w">          </span><span class="nt">env</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ENV</span>
+<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
+<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ENV</span>
+<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FLASK_SECRET_KEY</span>
+<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
+<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FLASK_SECRET_KEY</span>
+<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_INITDB_DATABASE</span>
+<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
+<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_INITDB_DATABASE</span>
+<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_INITDB_ROOT_PASSWORD</span>
+<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
+<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_INITDB_ROOT_PASSWORD</span>
+<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_INITDB_ROOT_USERNAME</span>
+<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
+<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_INITDB_ROOT_USERNAME</span>
+<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_PASSWORD</span>
+<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
+<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_PASSWORD</span>
+<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_USER</span>
+<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
+<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_USER</span>
+<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">QUOTES_APP_MONGO_CONN</span>
+<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
+<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">QUOTES_APP_MONGO_CONN</span>
+<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SENDGRID_API_KEY</span>
+<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
+<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SENDGRID_API_KEY</span>
+<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
+<span class="w">          </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local-app-image</span>
+<span class="w">          </span><span class="nt">imagePullPolicy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IfNotPresent</span>
+<span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-app</span>
+<span class="w">          </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8001</span>
+<span class="w">              </span><span class="nt">hostPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8001</span>
+<span class="w">              </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TCP</span>
+<span class="w">      </span><span class="nt">restartPolicy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Always</span>
+</code></pre></div>
+<p>Most parameters here are self-explanatory, but I want to highlight two of them:</p>
+<ul>
+<li><code>imagePullPolicy</code> - we need to set that to <code>Never</code> or <code>IfNotPresent</code> if we intend to run images we built locally. We also need to run <code>eval $(minikube docker-env)</code> in the same terminal I'm running <code>kubectl</code> commands as stated in the <a href="https://minikube.sigs.k8s.io/docs/handbook/pushing/#1-pushing-directly-to-the-in-cluster-docker-daemon-docker-env">official documentation</a></li>
+<li><code>replicas</code> - we can choose the number of containers we want to spin up (nifty stuff)</li>
+</ul>
+<p>Lastly, we spin up the schedule service:
+-  <code>kubectl apply -f schedule-service-claim0-persistentvolumeclaim.yaml</code>
+- <code>kubectl apply -f schedule-service-claim1-persistentvolumeclaim.yaml</code>
+- <code>kubectl apply -f schedule-service-service.yaml</code>
+- <code>kubectl apply -f schedule-service-deployment.yaml</code></p>
+<h3>Taking a look at our creation</h3>
+<p>To see what we just did, we could go old school with <code>kubectl get pods</code> (and some other commands) on the terminal. </p>
+<p>But Minikube has a web-based user interface that allows us to manage our Kubernetes'cluster in the browser. We can simply run <code>minikube dashboard</code> and go to <a href="http://127.0.0.1:52084/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/#/workloads?namespace=default">this link</a> on any browser.
+<img alt="Screenshot 2024-04-06 at 08.10.48" class="image-process-large-photo" sizes="(min-width: 1200px) 800px, (min-width: 992px) 650px, (min-width: 768px) 718px, 100vw" src="/images/derivatives/large-photo/800w/Screenshot 2024-04-06 at 08.10.48.png" srcset="/images/derivatives/large-photo/600w/Screenshot 2024-04-06 at 08.10.48.png 600w, /images/derivatives/large-photo/800w/Screenshot 2024-04-06 at 08.10.48.png 800w, /images/derivatives/large-photo/1600w/Screenshot 2024-04-06 at 08.10.48.png 1600w"/></p>
+<p>Here are some of the things we can do in that dashboard:</p>
+<ul>
+<li>Monitor the health of our applications and cluster</li>
+<li>Create, view, update, and delete Kubernetes resources</li>
+<li>View logs of our applications</li>
+<li>Access and manage secrets, config maps, and other configurations.</li>
+<li>Debug applications directly from the dashboard</li>
+</ul>
+<h2>Final thoughts</h2>
+<p>Many folks find Kubernetes to be complex, and some even say that those who praise it might not actually use it regularly. Although Kubernetes has become easier to use in some ways, setting it up still needs some previous knowledge, especially when it comes to configuring networks for load balancers to handle pods replicas correctly.</p>
+<p>But it's pretty amazing how quickly you can get a Kubernetes environment running on your own computer. This is super helpful when you're ready to move our applications to platforms like AWS EKS - it makes testing and development easier and sets you up for a smoother deployment in the real world.</p>
+</div>
+</article>
+</div>
+</div>
+<footer class="footer">
+<div class="container">
+<div class="row">
+<ul class="col-sm-6 list-inline">
+<li class="list-inline-item"><a href="/authors.html">Authors</a></li>
+<li class="list-inline-item"><a href="/archives.html">Archives</a></li>
+<li class="list-inline-item"><a href="/categories.html">Categories</a></li>
+<li class="list-inline-item"><a href="/tags.html">Tags</a></li>
+</ul>
+<p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">✨</a>
+</p>
+</div> </div>
+</footer>
+</body>
+</html>
