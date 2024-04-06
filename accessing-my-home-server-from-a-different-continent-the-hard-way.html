@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+<title>  Accessing my home server from a different continent (the hard way) | Felipe Arcaro's blog
+</title>
+<link href="/accessing-my-home-server-from-a-different-continent-the-hard-way.html" rel="canonical"/>
+<link href="/theme/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/theme/css/fontawesome.min.css" rel="stylesheet"/>
+<link href="/theme/css/pygments/autumn.min.css" rel="stylesheet"/>
+<link href="/theme/css/theme.css" rel="stylesheet"/>
+<meta content="Build a home server, they said, it will be fun, they said" name="description"/>
+</head>
+<body>
+<header class="header">
+<div class="container">
+<div class="row">
+<div class="col-sm-12">
+<h1 class="title"><a href="/">Felipe Arcaro's blog</a></h1>
+</div>
+</div> </div>
+</header>
+<div class="main">
+<div class="container">
+<h1>  Accessing my home server from a different continent (the hard way)
+</h1>
+<hr/>
+<article class="article">
+<header>
+<ul class="list-inline">
+<li class="list-inline-item text-muted" title="2023-10-13T13:27:00+02:00">
+<i class="fas fa-clock"></i>
+          Fri 13 October 2023
+        </li>
+<li class="list-inline-item">
+<i class="fas fa-folder-open"></i>
+<a href="/category/devops.html">DevOps</a>
+</li>
+<li class="list-inline-item">
+<i class="fas fa-tag"></i>
+<a href="/tag/ssh.html">#ssh</a>,               <a href="/tag/homeserver.html">#homeserver</a>,               <a href="/tag/bash.html">#bash</a> </li>
+</ul>
+</header>
+<div class="content">
+<h2>TL;DR</h2>
+<p>I have a home server in Porto, Portugal. When I needed to travel to Brazil for 4 months, I wanted to access my home server from a different network. While there are several tools available for this purpose, I decided to hack my way through it because... why not?</p>
+<p>So, I took the following steps:</p>
+<ul>
+<li>Wrote a script to periodically send me emails informing me if my home server's external IP had changed</li>
+<li>Configured the required port forwarding on my router</li>
+<li>Set up SSH keys between my laptop and my home server</li>
+<li>Implemented some monitoring</li>
+</ul>
+<hr/>
+<h2>My home server's IP</h2>
+<p>If you've ever tinkered with your home network, you've probably noticed that each device within your house is assigned an internal IP address, allowing them to communicate with each other. However, all these devices share access to the internet through a single IP address provided by your Internet Service Provider (ISP). You can easily find this external IP address on websites like <a href="https://whatismyipaddress.com/">this</a>, but it's important to note that this IP address might change over time.</p>
+<p>While there are tools like <a href="https://www.duckdns.org/">DuckDNS</a> available to manage dynamic IP changes, I decided to create my own hacky solution – I wrote a script to periodically check if my IP had changed and send me emails using SendGrid. </p>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
+
+<span class="c1"># Constants</span>
+<span class="nv">SENDGRID_API_KEY</span><span class="o">=</span><span class="s2">"MY_KEY"</span>
+<span class="nv">TO_EMAIL</span><span class="o">=</span><span class="s2">"my_email@gmail.com"</span>
+<span class="nv">FROM_EMAIL</span><span class="o">=</span><span class="s2">"my_email@gmail.com"</span>
+<span class="nv">CURRENT_IP</span><span class="o">=</span><span class="s2">"my_ip"</span>
+
+<span class="c1"># Get the external IP address using an external service</span>
+<span class="nv">EXTERNAL_IP</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-s<span class="w"> </span>http://api.ipify.org<span class="k">)</span>
+
+<span class="c1"># Compose the email content</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$EXTERNAL_IP</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"</span><span class="nv">$CURRENT_IP</span><span class="s2">"</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="nv">EMAIL_BODY</span><span class="o">=</span><span class="s2">"Yo, your home server IP address is still the same: </span><span class="nv">$EXTERNAL_IP</span><span class="s2">"</span>
+<span class="k">else</span>
+<span class="w">        </span><span class="nv">EMAIL_BODY</span><span class="o">=</span><span class="s2">"Yo, it looks like your home server IP address has changed: </span><span class="nv">$EXTERNAL_IP</span><span class="s2">"</span>
+<span class="k">fi</span>
+
+<span class="nv">EMAIL_SUBJECT</span><span class="o">=</span><span class="s2">"Home Server - Weekly IP check"</span>
+
+<span class="c1"># Create a temporary JSON payload file</span>
+<span class="nv">TMP_JSON</span><span class="o">=</span><span class="k">$(</span>mktemp<span class="k">)</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s1">'{</span>
+<span class="s1">  "personalizations": [</span>
+<span class="s1">    {</span>
+<span class="s1">      "to": [</span>
+<span class="s1">        {</span>
+<span class="s1">          "email": "'</span><span class="s2">"</span><span class="nv">$TO_EMAIL</span><span class="s2">"</span><span class="s1">'"</span>
+<span class="s1">        }</span>
+<span class="s1">      ],</span>
+<span class="s1">      "subject": "'</span><span class="s2">"</span><span class="nv">$EMAIL_SUBJECT</span><span class="s2">"</span><span class="s1">'"</span>
+<span class="s1">    }</span>
+<span class="s1">  ],</span>
+<span class="s1">  "from": {</span>
+<span class="s1">    "email": "'</span><span class="s2">"</span><span class="nv">$FROM_EMAIL</span><span class="s2">"</span><span class="s1">'"</span>
+<span class="s1">  },</span>
+<span class="s1">  "content": [</span>
+<span class="s1">    {</span>
+<span class="s1">      "type": "text/plain",</span>
+<span class="s1">      "value": "'</span><span class="s2">"</span><span class="nv">$EMAIL_BODY</span><span class="s2">"</span><span class="s1">'"</span>
+<span class="s1">    }</span>
+<span class="s1">  ]</span>
+<span class="s1">}'</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="nv">$TMP_JSON</span><span class="s2">"</span>
+
+<span class="c1"># Send email using SendGrid API</span>
+curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"https://api.sendgrid.com/v3/mail/send"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$SENDGRID_API_KEY</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>--data-binary<span class="w"> </span>@<span class="s2">"</span><span class="nv">$TMP_JSON</span><span class="s2">"</span>
+
+<span class="c1"># Clean up temporary JSON file</span>
+rm<span class="w"> </span><span class="s2">"</span><span class="nv">$TMP_JSON</span><span class="s2">"</span>
+</code></pre></div>
+<p>I scheduled the execution of that script using a cronjob (Linux). </p>
+<h2>Setting up port forwarding</h2>
+<p>Remember I mentioned all our home devices' traffic exits through a single IP? Well, it works the other way around too – we can use that same IP to access our home devices, with a little help. Most routers come with a firewall that blocks incoming traffic for security reasons. </p>
+<p>However, they also offer port forwarding, a feature that allows us to specify rules like "if someone tries to access my IP on port 123, redirect them to this internal IP (specific device) on the same port". </p>
+<p>Setting up port forwarding involves accessing our router's settings through a web browser, logging in with your credentials, and configuring the port forwarding rules accordingly. SSH (Secure Shell) connections typically use port <code>22</code>by default. I decided to use a less common port to avoid attacks targeting the default port.</p>
+<p>With port forwarding in place, we are ready to access my home server using SSH with <code>ssh my_user@my_external_ip</code> and entering my password, right? Well, technically yes, but passwords are no fun (and not really secure). That's why it's time to set up SSH keys for extra security.</p>
+<h2>Configuring SSH keys</h2>
+<h3>Creating keys on my laptop</h3>
+<p>First, I generated SSH keys on my laptop by running the following command in the terminal:</p>
+<div class="highlight"><pre><span></span><code>ssh-keygen<span class="w"> </span>-t<span class="w"> </span>rsa<span class="w"> </span>-b<span class="w"> </span><span class="m">4096</span><span class="w"> </span>-C<span class="w"> </span><span class="s2">"email@example.com"</span>
+</code></pre></div>
+<p>By default, both the public and private keys are stored in our home directory within a hidden folder named <code>.ssh</code>. The private key is typically named <code>id_rsa</code>, while the public key has the same name but with a <code>.pub</code> extension (<code>id_rsa.pub</code>).</p>
+<p>To view and copy the newly created public key, we can use the command <code>cat ~/.ssh/id_rsa.pub</code>, which will display something like this: <code>ssh-rsa &lt;long-string&gt; email@example.com</code></p>
+<h3>Adding the public key to my home server</h3>
+<p>Next, now on my home server, I log in with the desired user for SSH connections, and create the <code>.ssh</code> folder and <code>authorized_keys</code> file if they don't already exist:</p>
+<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>/home/my_user/.ssh<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>touch<span class="w"> </span>/home/my_user/.ssh/authorized_keys
+</code></pre></div>
+<p>Then, I paste my public key on <code>authorized_keys</code> file using a text editor.</p>
+<p>Finally, we ensure that the permissions on the <code>~/.ssh</code> directory and the <code>authorized_keys</code> file are correctly set for SSH to use them:</p>
+<div class="highlight"><pre><span></span><code>chmod<span class="w"> </span><span class="m">700</span><span class="w"> </span>/home/my_user/.ssh
+chmod<span class="w"> </span><span class="m">600</span><span class="w"> </span>/home/my_user/.ssh/authorized_keys
+</code></pre></div>
+<p>These permissions restrict access to the <code>.ssh</code> directory and its contents to only the user associated with it.</p>
+<h3>Removing password access</h3>
+<p>Now that we have properly set up the SSH keys, it's time to remove the password access. For that, we simply change set <code>PasswordAuthentication no</code> inside <code>/etc/ssh/sshd_config</code> and restart the SSH service with <code>sudo service ssh restart</code>.</p>
+<h2>Monitoring</h2>
+<p>Although this workflow seems fairly secure, it's always a good idea monitor SSH access. My home server runs on Ubuntu, so I SSH (and other) activity is logged on <code>/var/log/auth.log</code> file. </p>
+<p>I created a simple script to check for any changes in that file:</p>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
+
+<span class="c1"># Constants</span>
+<span class="nv">SENDGRID_API_KEY</span><span class="o">=</span><span class="s2">"MY_KEY"</span>
+<span class="nv">TO_EMAIL</span><span class="o">=</span><span class="s2">"my_email@gmail.com"</span>
+<span class="nv">FROM_EMAIL</span><span class="o">=</span><span class="s2">"my_email@gmail.com"</span>
+<span class="nv">CURRENT_IP</span><span class="o">=</span><span class="s2">"my_ip"</span>
+
+send_email_notification<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+
+<span class="w">        </span><span class="c1"># Create a temporary JSON payload file</span>
+<span class="w">        </span><span class="nv">TMP_JSON</span><span class="o">=</span><span class="k">$(</span>mktemp<span class="k">)</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s1">'{</span>
+<span class="s1">          "personalizations": [</span>
+<span class="s1">            {</span>
+<span class="s1">              "to": [</span>
+<span class="s1">                {</span>
+<span class="s1">                  "email": "'</span><span class="s2">"</span><span class="nv">$TO_EMAIL</span><span class="s2">"</span><span class="s1">'"</span>
+<span class="s1">                }</span>
+<span class="s1">              ],</span>
+<span class="s1">              "subject": "'</span><span class="s2">"</span><span class="nv">$EMAIL_SUBJECT</span><span class="s2">"</span><span class="s1">'"</span>
+<span class="s1">            }</span>
+<span class="s1">          ],</span>
+<span class="s1">          "from": {</span>
+<span class="s1">            "email": "'</span><span class="s2">"</span><span class="nv">$FROM_EMAIL</span><span class="s2">"</span><span class="s1">'"</span>
+<span class="s1">          },</span>
+<span class="s1">          "content": [</span>
+<span class="s1">            {</span>
+<span class="s1">              "type": "text/plain",</span>
+<span class="s1">              "value": "'</span><span class="s2">"</span><span class="nv">$EMAIL_BODY</span><span class="s2">"</span><span class="s1">'"</span>
+<span class="s1">            }</span>
+<span class="s1">          ]</span>
+<span class="s1">        }'</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="nv">$TMP_JSON</span><span class="s2">"</span>
+
+<span class="w">        </span><span class="c1"># Send email using SendGrid API</span>
+<span class="w">        </span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"https://api.sendgrid.com/v3/mail/send"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">             </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$SENDGRID_API_KEY</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">             </span>-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">             </span>--data-binary<span class="w"> </span>@<span class="s2">"</span><span class="nv">$TMP_JSON</span><span class="s2">"</span>
+
+<span class="w">        </span><span class="c1"># Clean up temporary JSON file</span>
+<span class="w">        </span>rm<span class="w"> </span><span class="s2">"</span><span class="nv">$TMP_JSON</span><span class="s2">"</span>
+<span class="o">}</span>
+
+<span class="c1"># Define the critical file to monitor</span>
+<span class="nv">ssh_logs_file</span><span class="o">=</span><span class="s2">"/var/log/auth.log"</span>
+
+<span class="c1"># Store the initial checksums</span>
+<span class="nv">initial_md5sum</span><span class="o">=</span><span class="k">$(</span>md5sum<span class="w"> </span><span class="s2">"</span><span class="nv">$ssh_logs_file</span><span class="s2">"</span><span class="k">)</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">"Initial md5sum: </span><span class="nv">$initial_md5sum</span><span class="s2">"</span>
+
+<span class="k">while</span><span class="w"> </span>true<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="c1"># Calculate the current checksums</span>
+<span class="w">    </span><span class="nv">current_md5sum</span><span class="o">=</span><span class="k">$(</span>md5sum<span class="w"> </span><span class="s2">"</span><span class="nv">$ssh_logs_file</span><span class="s2">"</span><span class="k">)</span>
+
+<span class="w">    </span><span class="c1"># Compare checksums to detect changes</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$initial_md5sum</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"</span><span class="nv">$current_md5sum</span><span class="s2">"</span><span class="w"> </span><span class="o">]({</span>filename<span class="o">}</span>/_<span class="s2">"</span><span class="nv">$initial_md5sum</span><span class="s2">"</span>_!<span class="o">=</span>_<span class="s2">"</span><span class="nv">$current_md5sum</span><span class="s2">"</span>_.md<span class="o">)</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span>send_email_notification
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Oops, it seems like checksum is different, new logs were added to ssh auth.log"</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Initial md5sum: </span><span class="nv">$initial_md5sum</span><span class="s2">"</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Current md5sum: </span><span class="nv">$current_md5sum</span><span class="s2">"</span>
+<span class="w">        </span><span class="nv">initial_md5sum</span><span class="o">=</span><span class="s2">"</span><span class="nv">$current_md5sum</span><span class="s2">"</span>
+<span class="w">    </span><span class="k">fi</span>
+
+<span class="w">    </span><span class="c1"># Adjust the sleep interval</span>
+<span class="w">    </span>sleep<span class="w"> </span><span class="m">300</span>
+<span class="k">done</span>
+</code></pre></div>
+<p>Then I ran the script</p>
+<div class="highlight"><pre><span></span><code><span class="w"> </span>chmod<span class="w"> </span>+x<span class="w"> </span>check-ssh-logs.sh<span class="w"> </span>
+<span class="w"> </span>nohup<span class="w"> </span>./check-ssh-logs.sh<span class="w"> </span><span class="p">&amp;</span><span class="w"> </span>
+</code></pre></div>
+<blockquote>
+<p><code>nohup</code> is a nifty command used to run a process immune to hangups, allowing it to continue running even after logging out</p>
+</blockquote>
+<p>Then I got married, traveled back to Portugal, had to move to a different apartment and haven't turned on my home server ever since. </p>
+</div>
+</article>
+</div>
+</div>
+<footer class="footer">
+<div class="container">
+<div class="row">
+<ul class="col-sm-6 list-inline">
+<li class="list-inline-item"><a href="/authors.html">Authors</a></li>
+<li class="list-inline-item"><a href="/archives.html">Archives</a></li>
+<li class="list-inline-item"><a href="/categories.html">Categories</a></li>
+<li class="list-inline-item"><a href="/tags.html">Tags</a></li>
+</ul>
+<p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">✨</a>
+</p>
+</div> </div>
+</footer>
+</body>
+</html>

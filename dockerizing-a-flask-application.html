@@ -45,6 +45,13 @@
 </ul>
 </header>
 <div class="content">
+<p>This article is part of a series.</p>
+<h4>Getting into Docker &amp; Kubernetes</h4>
+<ol>
+<li><strong><a href="/dockerizing-a-flask-application.html">Dockerizing a Flask Application</a></strong></li>
+<li><a href="{filename}/can_i_scale_my_dockerized_flask_solution_with_kubernetes?.md?.md">Can I scale my dockerized Flask solution with Kubernetes?</a></li>
+</ol>
+<hr/>
 <h2>TL;DR</h2>
 <p>Here's the <code>docker-compose.yml</code> file to dockerize a Flask application, a Mongo database and a schedule service:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">'3.8'</span>
@@ -117,6 +124,7 @@
 <li>mongo_db: a Mongo database</li>
 <li>schedule: an email schedule service </li>
 </ul>
+<p><img alt="app" class="image-process-large-photo" sizes="(min-width: 1200px) 800px, (min-width: 992px) 650px, (min-width: 768px) 718px, 100vw" src="/images/derivatives/large-photo/800w/app.png" srcset="/images/derivatives/large-photo/600w/app.png 600w, /images/derivatives/large-photo/800w/app.png 800w, /images/derivatives/large-photo/1600w/app.png 1600w"/></p>
 <p>Let's break the Docker Compose code down to understand these components at parameter level.</p>
 <h3>network</h3>
 <div class="highlight"><pre><span></span><code><span class="n">networks</span><span class="o">:</span>
