@@ -49,7 +49,7 @@
 <h4>Getting into Docker &amp; Kubernetes</h4>
 <ol>
 <li><a href="/dockerizing-a-flask-application.html">Dockerizing a Flask Application</a></li>
-<li><strong><a href="/can-i-scale-my-dockerized-flask-solution-with-kubernetes.html">Can I scale my dockerized Flask solution with Kubernetes?</a></strong></li>
+<li><strong><a href="{filename}/can_i_scale_my_dockerized_flask_solution_with_kubernetes?.md?.md">Can I scale my dockerized Flask solution with Kubernetes?</a></strong></li>
 </ol>
 <hr/>
 <h2>TL;DR</h2>
@@ -118,8 +118,12 @@
 - <code>mongo-db-claim1-persistentvolumeclaim.yaml</code>
 - <code>mongo-db-service.yaml</code>
 - <code>mongo-db-deployment.yaml</code>
-- <code>app-service.yaml
--</code>app-deployment.yaml<code>-</code>schedule-service-claim0-persistentvolumeclaim.yaml<code>-</code>schedule-service-claim1-persistentvolumeclaim.yaml<code>-</code>schedule-service-service.yaml<code>-</code>schedule-service-deployment.yaml`</p>
+- <code>app-service.yaml</code>
+- <code>app-deployment.yaml</code>
+- <code>schedule-service-claim0-persistentvolumeclaim.yaml</code>
+- <code>schedule-service-claim1-persistentvolumeclaim.yaml</code>
+- <code>schedule-service-service.yaml</code>
+- <code>schedule-service-deployment.yaml</code></p>
 <h3>Firing it all up</h3>
 <p>I am not super familiar with <a href="https://helm.sh/">Helm</a> but I think one of its features is to manage dependencies between those files, allowing us to run all of them in a <code>docker-compose up</code> style. </p>
 <p>For this post, let's do everything manually and cover the details on the <code>app</code> files.</p>
@@ -135,109 +139,109 @@
 - <code>kubectl apply -f app-deployment.yaml</code></p>
 <p>Let's take a deeper looker into these two files files:</p>
 <p>app-service.yaml:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Service</span>
-<span class="nt">metadata</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">annotations</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">kompose.cmd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kompose convert</span>
-<span class="w">    </span><span class="nt">kompose.version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.32.0 (HEAD)</span>
-<span class="w">  </span><span class="nt">labels</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">io.kompose.service</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
-<span class="nt">spec</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">ports</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">'8001'</span>
-<span class="w">      </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8001</span>
-<span class="w">      </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8001</span>
-<span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">io.kompose.service</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
+<div class="highlight"><pre><span></span><code><span class="n">apiVersion</span><span class="o">:</span><span class="w"> </span><span class="n">v1</span>
+<span class="n">kind</span><span class="o">:</span><span class="w"> </span><span class="n">Service</span>
+<span class="n">metadata</span><span class="o">:</span>
+<span class="w">  </span><span class="n">annotations</span><span class="o">:</span>
+<span class="w">    </span><span class="n">kompose</span><span class="o">.</span><span class="na">cmd</span><span class="o">:</span><span class="w"> </span><span class="n">kompose</span><span class="w"> </span><span class="n">convert</span>
+<span class="w">    </span><span class="n">kompose</span><span class="o">.</span><span class="na">version</span><span class="o">:</span><span class="w"> </span><span class="mf">1.32</span><span class="o">.</span><span class="mi">0</span><span class="w"> </span><span class="o">(</span><span class="n">HEAD</span><span class="o">)</span>
+<span class="w">  </span><span class="n">labels</span><span class="o">:</span>
+<span class="w">    </span><span class="n">io</span><span class="o">.</span><span class="na">kompose</span><span class="o">.</span><span class="na">service</span><span class="o">:</span><span class="w"> </span><span class="n">app</span>
+<span class="w">  </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">app</span>
+<span class="n">spec</span><span class="o">:</span>
+<span class="w">  </span><span class="n">ports</span><span class="o">:</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'8001'</span>
+<span class="w">      </span><span class="n">port</span><span class="o">:</span><span class="w"> </span><span class="mi">8001</span>
+<span class="w">      </span><span class="n">targetPort</span><span class="o">:</span><span class="w"> </span><span class="mi">8001</span>
+<span class="w">  </span><span class="n">selector</span><span class="o">:</span>
+<span class="w">    </span><span class="n">io</span><span class="o">.</span><span class="na">kompose</span><span class="o">.</span><span class="na">service</span><span class="o">:</span><span class="w"> </span><span class="n">app</span>
 </code></pre></div>
 <p>app-deployment.yaml:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apps/v1</span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deployment</span>
-<span class="nt">metadata</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">annotations</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">kompose.cmd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kompose convert</span>
-<span class="w">    </span><span class="nt">kompose.version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.32.0 (HEAD)</span>
-<span class="w">  </span><span class="nt">labels</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">io.kompose.service</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
-<span class="nt">spec</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
-<span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">io.kompose.service</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
-<span class="w">  </span><span class="nt">template</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">metadata</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">annotations</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">kompose.cmd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kompose convert</span>
-<span class="w">        </span><span class="nt">kompose.version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.32.0 (HEAD)</span>
-<span class="w">      </span><span class="nt">labels</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">io.kompose.network/test-kompose-my-network</span><span class="p">:</span><span class="w"> </span><span class="s">'true'</span>
-<span class="w">        </span><span class="nt">io.kompose.service</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
-<span class="w">    </span><span class="nt">spec</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">containers</span><span class="p">:</span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">args</span><span class="p">:</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flask</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">run</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'--host'</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0.0.0</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'--port'</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'8001'</span>
-<span class="w">          </span><span class="nt">env</span><span class="p">:</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ENV</span>
-<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
-<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ENV</span>
-<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FLASK_SECRET_KEY</span>
-<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
-<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FLASK_SECRET_KEY</span>
-<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_INITDB_DATABASE</span>
-<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
-<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_INITDB_DATABASE</span>
-<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_INITDB_ROOT_PASSWORD</span>
-<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
-<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_INITDB_ROOT_PASSWORD</span>
-<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_INITDB_ROOT_USERNAME</span>
-<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
-<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_INITDB_ROOT_USERNAME</span>
-<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_PASSWORD</span>
-<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
-<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_PASSWORD</span>
-<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_USER</span>
-<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
-<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONGO_USER</span>
-<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">QUOTES_APP_MONGO_CONN</span>
-<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
-<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">QUOTES_APP_MONGO_CONN</span>
-<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SENDGRID_API_KEY</span>
-<span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">configMapKeyRef</span><span class="p">:</span>
-<span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SENDGRID_API_KEY</span>
-<span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">env</span>
-<span class="w">          </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local-app-image</span>
-<span class="w">          </span><span class="nt">imagePullPolicy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IfNotPresent</span>
-<span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-app</span>
-<span class="w">          </span><span class="nt">ports</span><span class="p">:</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8001</span>
-<span class="w">              </span><span class="nt">hostPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8001</span>
-<span class="w">              </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TCP</span>
-<span class="w">      </span><span class="nt">restartPolicy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Always</span>
+<div class="highlight"><pre><span></span><code><span class="n">apiVersion</span><span class="o">:</span><span class="w"> </span><span class="n">apps</span><span class="o">/</span><span class="n">v1</span>
+<span class="n">kind</span><span class="o">:</span><span class="w"> </span><span class="n">Deployment</span>
+<span class="n">metadata</span><span class="o">:</span>
+<span class="w">  </span><span class="n">annotations</span><span class="o">:</span>
+<span class="w">    </span><span class="n">kompose</span><span class="o">.</span><span class="na">cmd</span><span class="o">:</span><span class="w"> </span><span class="n">kompose</span><span class="w"> </span><span class="n">convert</span>
+<span class="w">    </span><span class="n">kompose</span><span class="o">.</span><span class="na">version</span><span class="o">:</span><span class="w"> </span><span class="mf">1.32</span><span class="o">.</span><span class="mi">0</span><span class="w"> </span><span class="o">(</span><span class="n">HEAD</span><span class="o">)</span>
+<span class="w">  </span><span class="n">labels</span><span class="o">:</span>
+<span class="w">    </span><span class="n">io</span><span class="o">.</span><span class="na">kompose</span><span class="o">.</span><span class="na">service</span><span class="o">:</span><span class="w"> </span><span class="n">app</span>
+<span class="w">  </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">app</span>
+<span class="n">spec</span><span class="o">:</span>
+<span class="w">  </span><span class="n">replicas</span><span class="o">:</span><span class="w"> </span><span class="mi">3</span>
+<span class="w">  </span><span class="n">selector</span><span class="o">:</span>
+<span class="w">    </span><span class="n">matchLabels</span><span class="o">:</span>
+<span class="w">      </span><span class="n">io</span><span class="o">.</span><span class="na">kompose</span><span class="o">.</span><span class="na">service</span><span class="o">:</span><span class="w"> </span><span class="n">app</span>
+<span class="w">  </span><span class="n">template</span><span class="o">:</span>
+<span class="w">    </span><span class="n">metadata</span><span class="o">:</span>
+<span class="w">      </span><span class="n">annotations</span><span class="o">:</span>
+<span class="w">        </span><span class="n">kompose</span><span class="o">.</span><span class="na">cmd</span><span class="o">:</span><span class="w"> </span><span class="n">kompose</span><span class="w"> </span><span class="n">convert</span>
+<span class="w">        </span><span class="n">kompose</span><span class="o">.</span><span class="na">version</span><span class="o">:</span><span class="w"> </span><span class="mf">1.32</span><span class="o">.</span><span class="mi">0</span><span class="w"> </span><span class="o">(</span><span class="n">HEAD</span><span class="o">)</span>
+<span class="w">      </span><span class="n">labels</span><span class="o">:</span>
+<span class="w">        </span><span class="n">io</span><span class="o">.</span><span class="na">kompose</span><span class="o">.</span><span class="na">network</span><span class="o">/</span><span class="n">test</span><span class="o">-</span><span class="n">kompose</span><span class="o">-</span><span class="n">my</span><span class="o">-</span><span class="n">network</span><span class="o">:</span><span class="w"> </span><span class="s1">'true'</span>
+<span class="w">        </span><span class="n">io</span><span class="o">.</span><span class="na">kompose</span><span class="o">.</span><span class="na">service</span><span class="o">:</span><span class="w"> </span><span class="n">app</span>
+<span class="w">    </span><span class="n">spec</span><span class="o">:</span>
+<span class="w">      </span><span class="n">containers</span><span class="o">:</span>
+<span class="w">        </span><span class="o">-</span><span class="w"> </span><span class="n">args</span><span class="o">:</span>
+<span class="w">            </span><span class="o">-</span><span class="w"> </span><span class="n">flask</span>
+<span class="w">            </span><span class="o">-</span><span class="w"> </span><span class="n">run</span>
+<span class="w">            </span><span class="o">-</span><span class="w"> </span><span class="s1">'--host'</span>
+<span class="w">            </span><span class="o">-</span><span class="w"> </span><span class="mf">0.0</span><span class="o">.</span><span class="mf">0.0</span>
+<span class="w">            </span><span class="o">-</span><span class="w"> </span><span class="s1">'--port'</span>
+<span class="w">            </span><span class="o">-</span><span class="w"> </span><span class="s1">'8001'</span>
+<span class="w">          </span><span class="n">env</span><span class="o">:</span>
+<span class="w">            </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">ENV</span>
+<span class="w">              </span><span class="n">valueFrom</span><span class="o">:</span>
+<span class="w">                </span><span class="n">configMapKeyRef</span><span class="o">:</span>
+<span class="w">                  </span><span class="n">key</span><span class="o">:</span><span class="w"> </span><span class="n">ENV</span>
+<span class="w">                  </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">env</span>
+<span class="w">            </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">FLASK_SECRET_KEY</span>
+<span class="w">              </span><span class="n">valueFrom</span><span class="o">:</span>
+<span class="w">                </span><span class="n">configMapKeyRef</span><span class="o">:</span>
+<span class="w">                  </span><span class="n">key</span><span class="o">:</span><span class="w"> </span><span class="n">FLASK_SECRET_KEY</span>
+<span class="w">                  </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">env</span>
+<span class="w">            </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">MONGO_INITDB_DATABASE</span>
+<span class="w">              </span><span class="n">valueFrom</span><span class="o">:</span>
+<span class="w">                </span><span class="n">configMapKeyRef</span><span class="o">:</span>
+<span class="w">                  </span><span class="n">key</span><span class="o">:</span><span class="w"> </span><span class="n">MONGO_INITDB_DATABASE</span>
+<span class="w">                  </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">env</span>
+<span class="w">            </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">MONGO_INITDB_ROOT_PASSWORD</span>
+<span class="w">              </span><span class="n">valueFrom</span><span class="o">:</span>
+<span class="w">                </span><span class="n">configMapKeyRef</span><span class="o">:</span>
+<span class="w">                  </span><span class="n">key</span><span class="o">:</span><span class="w"> </span><span class="n">MONGO_INITDB_ROOT_PASSWORD</span>
+<span class="w">                  </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">env</span>
+<span class="w">            </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">MONGO_INITDB_ROOT_USERNAME</span>
+<span class="w">              </span><span class="n">valueFrom</span><span class="o">:</span>
+<span class="w">                </span><span class="n">configMapKeyRef</span><span class="o">:</span>
+<span class="w">                  </span><span class="n">key</span><span class="o">:</span><span class="w"> </span><span class="n">MONGO_INITDB_ROOT_USERNAME</span>
+<span class="w">                  </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">env</span>
+<span class="w">            </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">MONGO_PASSWORD</span>
+<span class="w">              </span><span class="n">valueFrom</span><span class="o">:</span>
+<span class="w">                </span><span class="n">configMapKeyRef</span><span class="o">:</span>
+<span class="w">                  </span><span class="n">key</span><span class="o">:</span><span class="w"> </span><span class="n">MONGO_PASSWORD</span>
+<span class="w">                  </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">env</span>
+<span class="w">            </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">MONGO_USER</span>
+<span class="w">              </span><span class="n">valueFrom</span><span class="o">:</span>
+<span class="w">                </span><span class="n">configMapKeyRef</span><span class="o">:</span>
+<span class="w">                  </span><span class="n">key</span><span class="o">:</span><span class="w"> </span><span class="n">MONGO_USER</span>
+<span class="w">                  </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">env</span>
+<span class="w">            </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">QUOTES_APP_MONGO_CONN</span>
+<span class="w">              </span><span class="n">valueFrom</span><span class="o">:</span>
+<span class="w">                </span><span class="n">configMapKeyRef</span><span class="o">:</span>
+<span class="w">                  </span><span class="n">key</span><span class="o">:</span><span class="w"> </span><span class="n">QUOTES_APP_MONGO_CONN</span>
+<span class="w">                  </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">env</span>
+<span class="w">            </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">SENDGRID_API_KEY</span>
+<span class="w">              </span><span class="n">valueFrom</span><span class="o">:</span>
+<span class="w">                </span><span class="n">configMapKeyRef</span><span class="o">:</span>
+<span class="w">                  </span><span class="n">key</span><span class="o">:</span><span class="w"> </span><span class="n">SENDGRID_API_KEY</span>
+<span class="w">                  </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">env</span>
+<span class="w">          </span><span class="n">image</span><span class="o">:</span><span class="w"> </span><span class="n">local</span><span class="o">-</span><span class="n">app</span><span class="o">-</span><span class="n">image</span>
+<span class="w">          </span><span class="n">imagePullPolicy</span><span class="o">:</span><span class="w"> </span><span class="n">IfNotPresent</span>
+<span class="w">          </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">my</span><span class="o">-</span><span class="n">app</span>
+<span class="w">          </span><span class="n">ports</span><span class="o">:</span>
+<span class="w">            </span><span class="o">-</span><span class="w"> </span><span class="n">containerPort</span><span class="o">:</span><span class="w"> </span><span class="mi">8001</span>
+<span class="w">              </span><span class="n">hostPort</span><span class="o">:</span><span class="w"> </span><span class="mi">8001</span>
+<span class="w">              </span><span class="n">protocol</span><span class="o">:</span><span class="w"> </span><span class="n">TCP</span>
+<span class="w">      </span><span class="n">restartPolicy</span><span class="o">:</span><span class="w"> </span><span class="n">Always</span>
 </code></pre></div>
 <p>Most parameters here are self-explanatory, but I want to highlight two of them:</p>
 <ul>
@@ -262,7 +266,8 @@
 <li>Debug applications directly from the dashboard</li>
 </ul>
 <h2>Final thoughts</h2>
-<p>Many folks find Kubernetes to be complex, and some even say that those who praise it might not actually use it regularly. Although Kubernetes has become easier to use in some ways, setting it up still needs some previous knowledge, especially when it comes to configuring networks for load balancers to handle pods replicas correctly.</p>
+<p>Many folks find Kubernetes to be complex, and some even say that those who praise it might not actually use it regularly. </p>
+<p>Although Kubernetes has become easier to use in some ways, setting it up still needs some previous knowledge, especially when it comes to configuring networks for load balancers to handle pods replicas correctly.</p>
 <p>But it's pretty amazing how quickly you can get a Kubernetes environment running on your own computer. This is super helpful when you're ready to move our applications to platforms like AWS EKS - it makes testing and development easier and sets you up for a smoother deployment in the real world.</p>
 </div>
 </article>
