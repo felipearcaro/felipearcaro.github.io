@@ -46,13 +46,13 @@
 </header>
 <div class="content">
 <h2>TL;DR</h2>
-<p>I built a Django application to manage Kindle highlights and wanted to have the simplest task handler solution possible - mainly to send emails to users with some of their highlights. For that:</p>
+<p>I built a <a href="https://quot.arcarofelipe.com/highlights/">Django app to manage Kindle highlights</a> and wanted to have the simplest task handler solution possible - mainly to send emails to users with some of their highlights and book recommendations.</p>
 <ul>
-<li>I used <a href="https://docs.djangoproject.com/en/5.0/ref/django-admin/">Django Management Commands</a> for the logic</li>
-<li>I used <a href="https://docs.github.com/pt/actions">GitHub Actions</a> for a simple (yet effective) task ochestration</li>
+<li>I used <a href="https://docs.djangoproject.com/en/5.0/ref/django-admin/">Django Management Commands</a> for the logic of sending daily emails</li>
+<li>I used <a href="https://docs.github.com/pt/actions">GitHub Actions</a> for a simple (yet effective) task orchestration workflow</li>
 </ul>
 <h3>Django Management commands</h3>
-<p>I first created the custom command in <em>highlights/management/commands/send_email.py</em>:</p>
+<p>First, I created a custom Command in <em>highlights/management/commands/send_email.py</em>:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">django.core.management.base</span> <span class="kn">import</span> <span class="n">BaseCommand</span>
 <span class="kn">from</span> <span class="nn">...utils.mail_sender</span> <span class="kn">import</span> <span class="n">MailSender</span>
 <span class="kn">from</span> <span class="nn">...models</span> <span class="kn">import</span> <span class="n">Highlight</span>
@@ -115,8 +115,80 @@
 </code></pre></div>
 <hr/>
 <h2>Why?</h2>
-<p>Whenever I needed a web app for something, I would always rely on Flask. Flask is fast, light and it's normally all you need if you're prototyping. But, I've always flirted with the idea of stepping up and using Django.</p>
-<p>To be continued...</p>
+<p>Whenever I needed a web app, I would always rely on Flask. Flask is fast and lightweight Python microframework, and usually all I needed for prototyping something from the ground up. However, I had always considered stepping up and using Django. After a few months, I can say I'm glad I took that step.</p>
+<h2>Django &amp; <code>manage.py</code></h2>
+<p>Django’s <code>manage.py</code> is a utility script that acts as a command-line interface to various Django utilities and management commands. For my Kindle highlights management app, I used it to create a custom command to handle the logic of sending daily emails.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">django.core.management.base</span> <span class="kn">import</span> <span class="n">BaseCommand</span>
+<span class="kn">from</span> <span class="nn">...utils.mail_sender</span> <span class="kn">import</span> <span class="n">MailSender</span>
+<span class="kn">from</span> <span class="nn">...models</span> <span class="kn">import</span> <span class="n">Highlight</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Command</span><span class="p">(</span><span class="n">BaseCommand</span><span class="p">):</span>
+    <span class="n">help</span> <span class="o">=</span> <span class="s1">'Sends a daily email to users with highlights'</span>
+
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">emailconfig__send_emails</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+            <span class="n">number_of_highlights</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">emailconfig</span><span class="o">.</span><span class="n">number_of_highlights</span>
+            <span class="n">highlights</span> <span class="o">=</span> <span class="n">Highlight</span><span class="o">.</span><span class="n">objects</span>\
+                <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>\
+                <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">'?'</span><span class="p">)</span>\
+                <span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s1">'highlight'</span><span class="p">,</span> <span class="s1">'book__title'</span><span class="p">,</span> <span class="s1">'book__author'</span><span class="p">)[:</span><span class="n">number_of_highlights</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">highlights</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Sending email to </span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s1"> with </span><span class="si">{</span>
+<span class="w">                            </span><span class="n">number_of_highlights</span><span class="si">}</span><span class="s1"> highlights...'</span><span class="p">)</span>
+                <span class="n">MailSender</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">highlights</span><span class="p">)</span><span class="o">.</span><span class="n">send_email</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">'No highlights were found for </span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</code></pre></div>
+<blockquote>
+<p>The file name is <code>send_email.py</code> so, to call it, I only need to run <code>python3 manage.py send_email</code>.</p>
+</blockquote>
+<p>I like custom commands because they allow for specific tasks to be separated from the main application logic, making the code cleaner and easier to maintain. These commands can be reused or changed without affecting other parts of the app, so if I want to adjust the email content or how highlights are selected, I can change it very easily. Also, Django management commands are easy to test and debug, which helps ensure that the email logic works correctly without needing to deploy the entire application.</p>
+<h2>GitHub Actions</h2>
+<p>GitHub Actions provides a flexible and really simple way to automate tasks. For this specific need, it was the perfect choice to handle the daily email-sending task for a few reasons:</p>
+<ul>
+<li>Setting up a workflow is straightforward due to the simple syntax and numerous pre-built actions and examples</li>
+<li>It runs inside a container ensuring a consistent and isolated environment that eliminates the "works on my machine" problem</li>
+<li>Since the code was already hosted on GitHub, using GitHub Actions for CI/CD and task scheduling meant I didn't need another tool or service, keeping everything managed in one place</li>
+<li>GitHub Actions supports various triggers and can run on different environments; I used a cron schedule to trigger the workflow daily at 14:00 UTC, ensuring users receive their emails at the same time each day</li>
+<li>Secrets and environment variables are securely managed by GitHub Actions, which was great for handling sensitive information like API keys and credentials to the database.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Send daily email with highlights</span>
+
+<span class="nt">on</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">schedule</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">cron</span><span class="p">:</span><span class="w"> </span><span class="s">"0</span><span class="nv"> </span><span class="s">14</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*"</span>
+
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">send-emails</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<span class="w">    </span><span class="nt">env</span><span class="p">:</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">ENV1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.ENV1 }}</span>
+<span class="w">      </span><span class="nt">ENV2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.ENV2 }}</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Checkout code</span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v2</span>
+
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Set up Python</span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/setup-python@v2</span>
+<span class="w">      </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="s">'3.x'</span>
+
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Install dependencies</span>
+<span class="w">      </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">        </span><span class="no">python -m pip install --upgrade pip</span>
+<span class="w">        </span><span class="no">pip install -r requirements.txt</span>
+
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Send emails</span>
+<span class="w">      </span><span class="nt">run</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">python3 manage.py send_email</span>
+</code></pre></div>
 </div>
 </article>
 </div>
